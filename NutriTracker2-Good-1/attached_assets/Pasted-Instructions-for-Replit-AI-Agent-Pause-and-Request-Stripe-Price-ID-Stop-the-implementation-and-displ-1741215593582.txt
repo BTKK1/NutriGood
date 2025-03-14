@@ -1,0 +1,55 @@
+Instructions for Replit AI Agent
+Pause and Request Stripe Price ID
+Stop the implementation and display this message to the user:
+text
+
+Collapse
+
+Wrap
+
+Copy
+Please provide the Stripe price ID for your recurring yearly product (SAR 129.99/year) that you created in your Stripe Dashboard. Enter it as an environment variable named YEARLY_PRICE_ID (e.g., YEARLY_PRICE_ID=price_123), and I’ll help integrate it securely to add the 3-day free trial.
+Wait for the user to provide the price ID before proceeding.
+Install Stripe Packages
+In the Replit terminal, run the command npm install @stripe/stripe-js stripe to install the Stripe packages for both the frontend and backend if they aren’t already installed.
+Set Up Stripe Price ID in Replit
+Once the user provides the YEARLY_PRICE_ID (e.g., price_123), add it as an environment variable in Replit’s Secrets:
+Go to the Secrets tab in Replit and add YEARLY_PRICE_ID with the value provided by the user (e.g., price_123).
+Ensure this variable is accessible in the code as process.env.YEARLY_PRICE_ID.
+Update the Frontend Payment Page
+Open /frontend/src/components/Payment.jsx and modify it to handle the "Start your 3-day FREE trial to continue." screen:
+Update the page to show the title "Start your 3-day FREE trial to continue.," a timeline with three points (Today with a lock icon, In 2 Days – Reminder with a bell icon, In 3 Days – Billing Starts with a crown icon), and radio buttons for subscription plans (Monthly: SAR 39.99/mo, disabled, and Yearly: SAR 10.83/mo with a "3 DAYS FREE" badge, pre-selected).
+Add a checkbox "No Payment Due Now" (checked by default) and a "Start My 3-Day Free Trial" button.
+Include text below the button: "3 days free, then SAR 129.99 per year (SAR 10.83/mo)."
+Add a "Restore" link in the top-right corner.
+Use Stripe’s JavaScript library (@stripe/stripe-js) to initialize Stripe with the STRIPE_PUBLISHABLE_KEY (stored in Replit Secrets).
+Configure the "Start My 3-Day Free Trial" button to use Stripe’s redirectToCheckout method, passing the YEARLY_PRICE_ID to set up a subscription with a 3-day free trial. Ensure it supports Apple Pay for iPhone users by including paymentMethodTypes: ['card', 'apple_pay'].
+Make the button disabled until the "No Payment Due Now" checkbox is checked, and ensure it redirects to /create-account on success or stays on /payment if canceled.
+Style everything with Tailwind CSS to match the minimalist design (black, white, gray, orange) and include a back arrow and progress bar at the top.
+Update the Backend Payment Endpoint
+Open /backend/routes/payment.js and update or create the /api/payment/trial endpoint:
+Use the stripe Node.js package, initialized with the STRIPE_SECRET_KEY (stored in Replit Secrets), to create a subscription for the user.
+Accept the user’s email in the request body and create a Stripe customer using that email.
+Use the YEARLY_PRICE_ID to set up a subscription with a trial_period_days: 3 parameter, setting the trial end date to March 8, 2025 (or 3 days from the current date, March 5, 2025).
+Ensure the subscription automatically charges SAR 129.99 annually after the trial unless canceled.
+Store the subscription ID in the users table in your database (ensure a subscriptionId column exists in /backend/db.js).
+Return a success response with the subscription ID or an error if something goes wrong.
+Ensure Database Support
+Open /backend/db.js and verify that the users table includes a subscriptionId column to store Stripe subscription IDs. If it doesn’t exist, add it to the table schema:
+Create or modify the users table to include subscriptionId TEXT as a column.
+Set Up Stripe Webhooks (Optional)
+In the Stripe Dashboard, go to Developers > Webhooks and create a webhook endpoint for https://your-replit-url/api/payment/webhook to handle events like trial expiration (customer.subscription.trial_will_end) and billing (invoice.payment_succeeded).
+In /backend/routes/payment.js, add a /api/payment/webhook endpoint to process these events, updating the user’s status in the database (e.g., trialActive, subscriptionStatus).
+Test the Implementation
+Use Stripe’s test mode with STRIPE_PUBLISHABLE_KEY and STRIPE_SECRET_KEY in Replit Secrets.
+Click "Start My 3-Day Free Trial" in Payment.jsx to test the Stripe redirect or checkout flow, ensuring it shows Apple Pay for iPhone users in Safari (iOS 10+).
+Use a test card (e.g., 4242 4242 4242 4242, any expiry date, CVC 123) to simulate the subscription setup without real charges.
+Verify in the Stripe Dashboard that the subscription is created with a 3-day trial ending on March 8, 2025, and test that it automatically charges SAR 129.99 after the trial (use Stripe’s test clock to simulate time passing).
+Test the back arrow to ensure it navigates correctly to the previous page, the "Restore" button (if implemented), and ensure the UI matches the screenshot’s design and responsiveness.
+Handle Apple Pay for iPhone Users
+Ensure the Stripe checkout includes the Apple Pay option in Safari on iPhones, triggering the native Apple Pay sheet for a one-touch subscription experience.
+Test with a test card in Apple Pay to simulate the flow without real charges.
+Ensure Design Consistency
+Maintain the minimalist design with black, white, gray, and orange colors, rounded edges, and icons, using Tailwind CSS.
+Use the "Saraat AI" app name and custom logo throughout the page.
+Once these steps are completed and tested, the payment page will offer a 3-day free trial for the yearly product, automatically charging SAR 129.99 annually after the trial, with Apple Pay support for iPhone users, fixing the button issue and ensuring a seamless user experience.

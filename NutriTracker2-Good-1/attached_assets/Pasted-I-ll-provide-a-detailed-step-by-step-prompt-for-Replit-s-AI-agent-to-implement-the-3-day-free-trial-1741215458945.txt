@@ -1,0 +1,93 @@
+I’ll provide a detailed, step-by-step prompt for Replit’s AI agent to implement the 3-day free trial for the yearly product (SAR 129.99/year) in the "Saraat AI" application, based on the guide I provided earlier. This prompt assumes you’ve provided the YEARLY_PRICE_ID (e.g., as an environment variable YEARLY_PRICE_ID=price_123) in Replit’s Secrets, and it focuses on updating the payment page (/frontend/src/components/Payment.jsx) and backend (/backend/routes/payment.js) to handle the Stripe subscription with a 3-day free trial, ensuring Apple Pay support for iPhone users. The prompt ensures the app name is "Saraat AI" and uses your custom logo (already inserted in the project).
+
+plaintext
+
+Collapse
+
+Wrap
+
+Copy
+You are an expert fullstack developer with 30 years of experience, currently working on the "Saraat AI" calorie tracking web application in Replit, built with React.js for the frontend, Express.js for the backend, and Tailwind CSS for styling. We need to implement a 3-day free trial for the yearly product (SAR 129.99/year) in the "Start your 3-day FREE trial to continue." payment page, ensuring the subscription automatically charges SAR 129.99 after the trial unless canceled. The user has provided the Stripe price ID for the yearly product as an environment variable `YEARLY_PRICE_ID=price_123` in Replit’s Secrets. We also need to ensure the "Start My 3-Day Free Trial" button triggers the Stripe payment popup or redirect/checkout flow, including Apple Pay support for iPhone users. The app name is "Saraat AI," and we’re using our custom logo (already inserted in the project). Here are the steps to implement this:
+
+1. **Verify Stripe Packages**
+   - Ensure the Stripe packages are installed in Replit by running `npm install @stripe/stripe-js stripe` in the terminal if they aren’t already installed.
+
+2. **Frontend: Update Payment.jsx**
+   - Modify `/frontend/src/components/Payment.jsx` to use Stripe’s `redirectToCheckout` for setting up a subscription with a 3-day free trial, supporting Apple Pay for iPhone users:
+     ```javascript
+     import React, { useState } from 'react';
+     import { loadStripe } from '@stripe/stripe-js';
+     import { Elements } from '@stripe/react-stripe-js';
+
+     const stripePromise = loadStripe(process.env.STRIPE_PUBLISHABLE_KEY);
+
+     function PaymentContent() {
+       const [selectedPlan, setSelectedPlan] = useState('yearly');
+
+       const handleTrial = async () => {
+         const stripe = await stripePromise;
+         try {
+           const { error } = await stripe.redirectToCheckout({
+             lineItems: [{ price: process.env.YEARLY_PRICE_ID, quantity: 1 }], // Use the provided yearly price ID
+             mode: 'subscription',
+             successUrl: window.location.origin + '/create-account',
+             cancelUrl: window.location.origin + '/payment',
+             customerEmail: 'user@example.com', // Replace with user email or fetch dynamically
+             subscriptionData: { trialPeriodDays: 3 }, // 3-day free trial
+             paymentMethodTypes: ['card', 'apple_pay'], // Support Apple Pay for iPhone users
+           });
+           if (error) throw error;
+         } catch (error) {
+           console.error(error);
+           alert('Error starting trial: ' + error.message);
+         }
+       };
+
+       return (
+         <div className="p-4">
+           <h1 className="text-2xl font-bold mb-4">Start your 3-day FREE trial to continue.</h1>
+           <div className="flex flex-col space-y-4 mb-4">
+             <div className="flex items-center space-x-4">
+               <span className="bg-orange-200 rounded-full p-2">🔓</span>
+               <p className="text-gray-500">Today: Unlock all the app’s features like AI calorie scanning and more.</p>
+             </div>
+             <div className="flex items-center space-x-4">
+               <span className="bg-orange-200 rounded-full p-2">🔔</span>
+               <p className="text-gray-500">In 2 Days – Reminder: We’ll send you a reminder that your trial is ending soon.</p>
+             </div>
+             <div className="flex items-center space-x-4">
+               <span className="bg-black rounded-full p-2 text-white">👑</span>
+               <p className="text-gray-500">In 3 Days – Billing Starts: You’ll be charged on 8 Mar 2025 unless you cancel anytime before.</p>
+             </div>
+           </div>
+           <div className="flex space-x-4 mb-4">
+             <label className="bg-white rounded-lg shadow-md p-4 cursor-pointer opacity-50">
+               <input type="radio" name="plan" value="monthly" checked={selectedPlan === 'monthly'} onChange={() => setSelectedPlan('monthly')} className="mr-2" disabled />
+               Monthly: SAR 39.99/mo
+             </label>
+             <label className="bg-white rounded-lg shadow-md p-4 cursor-pointer">
+               <input type="radio" name="plan" value="yearly" checked={selectedPlan === 'yearly'} onChange={() => setSelectedPlan('yearly')} className="mr-2" />
+               Yearly: SAR 10.83/mo <span className="bg-black text-white rounded px-2">3 DAYS FREE</span>
+             </label>
+           </div>
+           <label className="flex items-center space-x-2 mb-4 text-gray-500">
+             <input type="checkbox" defaultChecked className="mr-2" />
+             No Payment Due Now
+           </label>
+           <button onClick={handleTrial} className="bg-black text-white rounded-lg px-4 py-2 w-full mb-2" disabled={!stripePromise}>
+             Start My 3-Day Free Trial
+           </button>
+           <p className="text-gray-500 text-sm">3 days free, then SAR 129.99 per year (SAR 10.83/mo)</p>
+         </div>
+       );
+     }
+
+     export default function Payment() {
+       return (
+         <Elements stripe={stripePromise}>
+           <PaymentContent />
+         </Elements>
+       );
+     }
+Ensure the button is disabled until Stripe is loaded and the "No Payment Due Now" checkbox is checked, using state to manage this logic.
+Verify the UI matches the screenshot’s design (black, white, gray, orange), remains responsive, and uses the "Saraat AI" logo.

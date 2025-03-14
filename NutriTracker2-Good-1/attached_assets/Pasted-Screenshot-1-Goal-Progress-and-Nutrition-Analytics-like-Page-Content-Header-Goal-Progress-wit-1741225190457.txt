@@ -1,0 +1,113 @@
+Screenshot 1: Goal Progress and Nutrition (Analytics-like Page)
+Content:
+Header: "Goal Progress" with "100% Goal achieved" indicator.
+Tabs: "90 Days," "6 Months," "1 Year," "All time" for time range selection.
+Goal Progress Graph: Shows weight progression (e.g., 120 to 115 lbs) with a simple line graph.
+Nutrition Section: Tabs "This week," "Last week," "2 wks. ago," "3 wks. ago" with "No data to show" message and "This will update as you log more food."
+Bottom Navigation: Icons for "Home," "Analytics," "Settings," and a "+" button (likely for adding data).
+Features:
+Displays user progress toward weight goals over selectable time periods.
+Nutrition tracking with placeholder for logged food data.
+Interactive tabs for time range selection.
+Frontend Considerations: Use React for dynamic tab switching, Tailwind CSS for the soft pastel design (gray background, white cards), and state management for graph data. Ensure responsive design for mobile.
+Backend Considerations: Store user weight data and nutrition logs in a database (e.g., SQLite), with APIs to fetch data based on time range.
+Screenshot 2: Customization (Settings Subpage)
+Content:
+Header: "Customization."
+Sections: "Personal details," "Adjust goals" (Calories, carbs, fats, protein), "Change language," "Preferences" (Burned Calories toggle, Live Activity toggle), "Widgets" (with "How to add?" link), and "Legal" (Terms, Privacy, Support Email, Delete Account).
+Bottom Navigation: Same as above ("Home," "Analytics," "Settings," "+").
+Features:
+Allows users to adjust personal goals and preferences.
+Toggles for burned calories and Live Activity (likely for iOS integration).
+Widget setup instructions and legal links.
+Frontend Considerations: Use collapsible sections or navigation for sub-items, styled with Tailwind CSS (rounded cards, gray text). Handle toggle states with React.
+Backend Considerations: API endpoints to update user goals, preferences, and handle widget setup logic. Store user settings in a database.
+Screenshot 3: Adjust Goals (Settings Subpage)
+Content:
+Header: "Adjust goals" with "Calories, carbs, fats, and protein."
+Sections: Same as Screenshot 2 under "Preferences" and "Widgets."
+Bottom Navigation: Same as above.
+Features:
+Specific focus on adjusting nutritional goals.
+Frontend Considerations: Form inputs for goal adjustments, styled consistently with previous screens.
+Backend Considerations: API to save updated goals to the user’s profile.
+Screenshot 4: Preferences (Settings Subpage)
+Content:
+Header: "Preferences" with toggles for "Burned Calories" and "Live Activity."
+Widgets Section: Shows macros (118g Protein, 260g Carbs, 56g Fats) with "Scan Food" and "Barcode" options.
+Legal Section: Same as Screenshot 2.
+Bottom Navigation: Same as above.
+Features:
+Toggle-based preference settings.
+Macro tracking with scan functionality.
+Frontend Considerations: Dynamic toggle UI, possibly with modals for scanning.
+Backend Considerations: API to toggle preferences and process scan data (e.g., AI calorie scanning integration).
+Screenshot 5: Widgets Setup Step 1
+Content:
+Header: "Widgets" with "How to add?" link.
+Instruction: "1 Hold an empty area of the home screen and tap plus button."
+Bottom Navigation: Same as above.
+Features:
+Guides widget addition on iOS.
+Frontend Considerations: Static instructional text with a clean layout.
+Backend Considerations: No direct backend needed, but ensure widget data (macros) is server-synchronized.
+Screenshot 6: Widgets Setup Step 2
+Content:
+Header: "Widgets" with "How to add?" link.
+Instruction: "2 Search for Cal AI and tap it."
+Bottom Navigation: Same as above.
+Features:
+Continues widget setup process.
+Frontend Considerations: Sequential instructional design.
+Backend Considerations: None specific.
+Screenshot 7: Widgets Setup Step 3
+Content:
+Header: "Widgets" with "How to add?" link.
+Instruction: "3 Pick the one you like and then click Add Widget."
+Bottom Navigation: Same as above.
+Features:
+Finalizes widget addition.
+Frontend Considerations: Clear call-to-action layout.
+Backend Considerations: None specific.
+Screenshot 8: Settings Overview
+Content:
+Header: "Settings" with fields for "Age" (24), "Height" (6 ft 11 in), "Current weight" (118 lbs), "Current Balance" ($0), and a "Refer friends to earn $" button.
+Sections: "Customization" (Personal details, Adjust goals, Change language).
+Bottom Navigation: Same as above.
+Features:
+Displays user profile data and referral option.
+Frontend Considerations: Read-only fields with a styled button, consistent design.
+Backend Considerations: API to fetch and update user profile, handle referral logic.
+Screenshot 9: Home Screen (Cal AI)
+Content:
+Header: "Cal AI" with calendar and a "0" badge (possibly activity count).
+Macros: 2017 Calories left, 118g Protein, 260g Carbs, 56g Fats with icons.
+Recently Logged: "You haven’t uploaded any food. Start tracking today’s meals by taking a quick picture."
+Bottom Navigation: Same as above.
+Features:
+Dashboard for daily macro tracking and food logging.
+AI-driven food scanning suggestion.
+Frontend Considerations: Dynamic macro display, button for photo upload, responsive layout.
+Backend Considerations: API for macro calculations, image upload for AI scanning.
+Screenshot 10: Analytics (Weight and BMI)
+Content:
+Header: "Analytics."
+Sections: "Goal Weight" (118 lbs with Update button), "Current Weight" (118 lbs with update reminder), "Your BMI" (12.0, Underweight) with a color-coded scale, "Goal Progress" (100% achieved) with time range tabs.
+Bottom Navigation: Same as above.
+Features:
+Weight and BMI tracking with progress visualization.
+Frontend Considerations: Interactive tabs, progress bar, color-coded BMI scale.
+Backend Considerations: API to calculate BMI, store weight updates.
+Observations and Context for Prompts
+App Name: "Saraat AI" (though "Cal AI" appears in widget setup, likely a branding variation or placeholder).
+Design: Consistent minimalist style with soft gray backgrounds, white cards, black buttons, and pastel accents (orange, green, blue). Rounded edges and iOS-inspired layout suggest mobile-first design.
+Features:
+Goal tracking (weight, nutrition).
+Analytics and progress visualization.
+Customization (goals, preferences, widgets).
+AI-powered food scanning and macro tracking.
+Live Activity and widget integration for iOS.
+User profile management and referrals.
+Navigation: Bottom tab bar ("Home," "Analytics," "Settings," "+") for seamless navigation.
+Frontend: Likely React.js with Tailwind CSS, Wouter for routing, and custom UI components (Button, Card).
+Backend: Node.js/Express with a database (e.g., SQLite) for user data, goals, nutrition logs, and Stripe integration for subscriptions.

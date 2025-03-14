@@ -1,0 +1,256 @@
+Overview of Firestore Integration
+Firestore, as a NoSQL database, organizes data into collections and documents. For your Saraat AI app, we’ll store each user’s data in a document within a users collection, where the document ID is the user’s Firebase Authentication UID. This ensures a one-to-one mapping between the authenticated user and their data.
+
+Collection: users
+Document ID: The user’s UID (from Firebase Authentication, e.g., uid123)
+Document Data: A JSON-like object containing the user’s onboarding data (e.g., personal details, fitness goals, etc.).
+After each onboarding step, the app should update the user’s document in Firestore with the collected data. This ensures the data is persisted and can be retrieved later to generate the user’s fitness plan, display their profile, or personalize the app experience.
+
+Firestore Database Structure
+The users collection will contain documents for each user, with the following structure based on the onboarding steps (excluding allergies, as you didn’t request that):
+
+Collection Path: /users
+Document Path: /users/{uid}
+Sample Document:
+json
+
+Collapse
+
+Wrap
+
+Copy
+{
+  "uid": "uid123", // Matches the Firebase Auth UID
+  "email": "user@example.com", // From account creation
+  "createdAt": "2025-03-13T10:00:00Z", // Timestamp of account creation
+  "onboardingStartedAt": "2025-03-13T10:01:00Z", // Timestamp when onboarding begins
+  "onboardingStep": "final", // Tracks the current step (updated after each step)
+  "age": 30, // From Personal Details step
+  "gender": "female", // From Personal Details step
+  "height": 170, // From Personal Details step (in cm)
+  "weight": 65, // From Personal Details step (in kg)
+  "fitnessGoal": "weightLoss", // From Fitness Goals step
+  "targetWeight": 60, // From Fitness Goals step (optional, if weight-related goal)
+  "activityLevel": "moderatelyActive", // From Activity Level step
+  "dietaryPreference": "vegetarian", // From Dietary Preferences step
+  "subscriptionStatus": "trial", // From Payment/Trial step
+  "trialEndDate": "2025-03-27T10:00:00Z", // From Payment/Trial step (if trial)
+  "onboardingComplete": true, // From Final step
+  "onboardingCompletedAt": "2025-03-13T10:10:00Z" // From Final step
+}
+text
+
+Collapse
+
+Wrap
+
+Copy
+
+---
+
+### How Each Onboarding Step Affects the Firestore Database
+Each onboarding step collects specific data and updates the user’s document in Firestore. Here’s how this happens step-by-step, including how the data will be used later in the app (e.g., to generate the fitness plan).
+
+#### 1. Post-Account Creation (Before Onboarding Starts)
+- **When**: Immediately after the user creates an account in `auth.tsx` (via email/password sign-up).
+- **Data Collected**:
+  - The user’s UID and email are available from Firebase Authentication.
+  - A timestamp of account creation is generated.
+- **Firestore Update**:
+  - **Action**: Create a new document in the `users` collection with the user’s UID as the document ID.
+  - **Fields Added**:
+    - `uid`: The user’s UID (e.g., `uid123`).
+    - `email`: The user’s email (e.g., `user@example.com`).
+    - `createdAt`: A timestamp of when the account was created (e.g., `2025-03-13T10:00:00Z`).
+- **Purpose**:
+  - Establishes the user’s document in Firestore, providing a foundation for adding onboarding data.
+  - Ensures the user’s basic identity is stored for later reference (e.g., displaying their email in the app).
+- **Usage in Plan and App**:
+  - The `email` can be used for sending notifications or receipts (e.g., trial expiration emails).
+  - The `createdAt` timestamp helps track user retention (e.g., “User joined 5 days ago”).
+
+#### 2. Welcome Step
+- **When**: The user starts the onboarding process at `/onboarding` (first step).
+- **Data Collected**:
+  - No user-specific data is collected, but the app logs the start of onboarding.
+- **Firestore Update**:
+  - **Action**: Update the user’s document in Firestore.
+  - **Fields Added/Updated**:
+    - `onboardingStartedAt`: A timestamp of when onboarding began (e.g., `2025-03-13T10:01:00Z`).
+    - `onboardingStep`: Set to `"welcome"` to track progress.
+- **Purpose**:
+  - Tracks that the user has started onboarding, which can be useful for analytics (e.g., how many users drop off during onboarding).
+  - The `onboardingStep` field allows the app to resume onboarding if the user leaves and returns later.
+- **Usage in Plan and App**:
+  - **Analytics**: Helps measure onboarding completion rates (e.g., “80% of users who started onboarding completed it”).
+  - **User Experience**: If the user logs out and back in before completing onboarding, the app can redirect them to the correct step based on `onboardingStep`.
+
+#### 3. Personal Details Step (Age, Gender, Height, Weight)
+- **When**: The user submits their personal details in the onboarding flow.
+- **Data Collected**:
+  - Age, gender, height, and weight.
+- **Firestore Update**:
+  - **Action**: Update the user’s document in Firestore.
+  - **Fields Added/Updated**:
+    - `age`: The user’s age (e.g., `30`).
+    - `gender`: The user’s gender (e.g., `"female"`).
+    - `height`: The user’s height in cm (e.g., `170`).
+    - `weight`: The user’s weight in kg (e.g., `65`).
+    - `onboardingStep`: Set to `"personalDetails"`.
+- **Purpose**:
+  - Stores foundational data needed to calculate the user’s fitness plan (e.g., Basal Metabolic Rate, BMI).
+  - Provides a baseline for tracking progress (e.g., weight changes over time).
+- **Usage in Plan and App**:
+  - **Fitness Plan**: Used to calculate BMR (e.g., using the Harris-Benedict equation: for a 30-year-old female, 170 cm, 65 kg, BMR ≈ 1,400 kcal/day). This is the starting point for setting calorie goals.
+  - **Progress Tracking**: The initial `weight` serves as the baseline for tracking weight changes (e.g., if the user’s goal is weight loss, the app compares future weights to this value).
+  - **Personalization**: Gender and age influence exercise recommendations (e.g., women might get more focus on iron-rich foods, older users might get lower-impact exercises).
+
+#### 4. Fitness Goals Step (e.g., Weight Loss, Muscle Gain, General Health)
+- **When**: The user selects their fitness goal.
+- **Data Collected**:
+  - The user’s primary fitness goal and, if applicable, a target weight.
+- **Firestore Update**:
+  - **Action**: Update the user’s document in Firestore.
+  - **Fields Added/Updated**:
+    - `fitnessGoal`: The user’s goal (e.g., `"weightLoss"`).
+    - `targetWeight`: The desired weight, if the goal involves weight change (e.g., `60` kg for weight loss).
+    - `onboardingStep`: Set to `"fitnessGoals"`.
+- **Purpose**:
+  - Defines the user’s objective, which directly influences their fitness and nutrition plan.
+  - The `targetWeight` provides a measurable goal for progress tracking.
+- **Usage in Plan and App**:
+  - **Fitness Plan**:
+    - Weight Loss: Adjusts calorie intake below maintenance (e.g., 500 kcal deficit, so if maintenance is 2,000 kcal/day, the goal becomes 1,500 kcal/day).
+    - Muscle Gain: Increases calorie intake above maintenance (e.g., +300 kcal/day) with a focus on protein.
+    - General Health: Sets calories at maintenance for balance.
+  - **Exercise Plan**:
+    - Weight Loss: Prioritizes calorie-burning activities (e.g., cardio, HIIT).
+    - Muscle Gain: Focuses on strength training (e.g., weightlifting).
+  - **Goal Tracking**: The app uses `fitnessGoal` and `targetWeight` to track progress (e.g., “You’re 2 kg away from your target weight of 60 kg!”).
+
+#### 5. Activity Level Step (e.g., Sedentary, Moderately Active, Very Active)
+- **When**: The user selects their current activity level.
+- **Data Collected**:
+  - The user’s activity level.
+- **Firestore Update**:
+  - **Action**: Update the user’s document in Firestore.
+  - **Fields Added/Updated**:
+    - `activityLevel`: The user’s activity level (e.g., `"moderatelyActive"`).
+    - `onboardingStep`: Set to `"activityLevel"`.
+- **Purpose**:
+  - Adjusts the user’s calorie needs based on their activity level.
+  - Helps tailor the exercise plan to their current fitness level.
+- **Usage in Plan and App**:
+  - **Fitness Plan**:
+    - Calculates Total Daily Energy Expenditure (TDEE) by multiplying BMR by an activity factor:
+      - Sedentary: BMR × 1.2
+      - Moderately Active: BMR × 1.55
+      - Very Active: BMR × 1.9
+    - Example: A BMR of 1,400 kcal/day for a moderately active user results in a TDEE of 1,400 × 1.55 = 2,170 kcal/day.
+    - Adjusts calorie goals based on `fitnessGoal` (e.g., 2,170 - 500 = 1,670 kcal/day for weight loss).
+  - **Exercise Plan**:
+    - Sedentary: Beginner exercises (e.g., walking).
+    - Moderately Active: Balanced cardio and strength (e.g., 3 days cardio, 2 days strength).
+    - Very Active: Advanced workouts (e.g., 5 days of mixed high-intensity training).
+  - **Progress Monitoring**: Sets a baseline for activity improvements (e.g., a sedentary user might aim to become moderately active).
+
+#### 6. Dietary Preferences Step (e.g., Vegetarian, Vegan)
+- **When**: The user selects their dietary preference (excluding allergies, as requested).
+- **Data Collected**:
+  - The user’s dietary preference.
+- **Firestore Update**:
+  - **Action**: Update the user’s document in Firestore.
+  - **Fields Added/Updated**:
+    - `dietaryPreference`: The user’s dietary preference (e.g., `"vegetarian"`).
+    - `onboardingStep`: Set to `"dietaryPreferences"`.
+- **Purpose**:
+  - Customizes the user’s meal plan based on their dietary restrictions.
+- **Usage in Plan and App**:
+  - **Meal Plan**:
+    - Vegetarian: Excludes meat (e.g., suggests tofu-based meals).
+    - Vegan: Excludes all animal products (e.g., recommends plant-based proteins like lentils).
+  - **Macronutrient Adjustments**:
+    - Ensures protein goals are met with plant-based sources (e.g., a vegetarian user might get more beans and legumes).
+  - **Food Database**: Filters out restricted foods (e.g., no meat options for vegetarians in the “Add Ingredient” page).
+
+#### 7. Payment/Trial Step (Subscription or Trial Setup)
+- **When**: The user completes the payment or trial setup.
+- **Data Collected**:
+  - Subscription status and trial end date (if applicable).
+- **Firestore Update**:
+  - **Action**: Update the user’s document in Firestore.
+  - **Fields Added/Updated**:
+    - `subscriptionStatus`: The user’s plan (e.g., `"trial"` or `"premium"`).
+    - `trialEndDate`: The trial expiration date, if on a trial (e.g., `2025-03-27T10:00:00Z` for a 14-day trial).
+    - `onboardingStep`: Set to `"payment"`.
+- **Purpose**:
+  - Determines the user’s access level (e.g., premium features vs. free features).
+  - Tracks trial duration for follow-up actions (e.g., reminders to subscribe).
+- **Usage in Plan and App**:
+  - **Feature Access**:
+    - Trial/Premium: Unlocks advanced plan features (e.g., detailed meal plans, analytics).
+    - Free: Limits to basic features (e.g., simple meal suggestions).
+  - **Plan Customization**:
+    - Premium users get AI-driven meal and workout plans.
+    - Free users get a generic plan.
+  - **Notifications**: Sends trial expiration reminders (e.g., “Your trial ends in 2 days!”).
+
+#### 8. Final Step (Confirmation and Redirection)
+- **When**: The user completes onboarding and is redirected to `/home`.
+- **Data Collected**:
+  - Marks onboarding as complete with a timestamp.
+- **Firestore Update**:
+  - **Action**: Update the user’s document in Firestore.
+  - **Fields Added/Updated**:
+    - `onboardingComplete`: Set to `true`.
+    - `onboardingCompletedAt`: A timestamp of when onboarding was completed (e.g., `2025-03-13T10:10:00Z`).
+    - `onboardingStep`: Set to `"final"`.
+- **Purpose**:
+  - Confirms the user has finished onboarding, allowing the app to transition to the main experience.
+  - The timestamp helps track how long onboarding took (e.g., for analytics).
+- **Usage in Plan and App**:
+  - **Plan Finalization**: The app uses all collected data to finalize the fitness plan:
+    - Example: A 30-year-old female, 170 cm, 65 kg, moderately active, aiming for weight loss, vegetarian, on a trial plan gets a plan of 1,670 kcal/day with vegetarian meals and cardio/HIIT workouts.
+  - **User Experience**: The app now displays the `/home` page with the user’s plan, goals, and tracking features.
+  - **Analytics**: Logs onboarding completion for metrics (e.g., “90% of users completed onboarding”).
+
+---
+
+### How the Data is Used to Generate the Plan and Affect the App
+The data stored in Firestore is used to generate the user’s fitness and nutrition plan, as well as to personalize other aspects of the app:
+
+- **Fitness Plan**:
+  - **Calorie Goals**: Calculated using BMR (from `age`, `gender`, `height`, `weight`) × activity factor (from `activityLevel`), adjusted by `fitnessGoal` (e.g., deficit for weight loss).
+  - **Macronutrient Ratios**: Tailored by `fitnessGoal` and `dietaryPreference` (e.g., higher protein for muscle gain, plant-based for vegetarians).
+  - **Exercise Plan**: Customized by `fitnessGoal` and `activityLevel` (e.g., cardio for weight loss, strength for muscle gain, beginner exercises for sedentary users).
+
+- **Meal Plan**:
+  - Filtered by `dietaryPreference` (e.g., vegetarian meals only).
+  - Adjusted to meet calorie and macro goals (e.g., ensures enough protein for a vegetarian user).
+
+- **Feature Access**:
+  - Determined by `subscriptionStatus` (e.g., premium users get advanced analytics, free users get basic features).
+
+- **Progress Tracking**:
+  - Uses initial `weight`, `fitnessGoal`, and `targetWeight` to track progress (e.g., “You’ve lost 1 kg since starting!”).
+
+- **Notifications**:
+  - Sends reminders based on `trialEndDate` (e.g., “Your trial ends soon!”).
+  - Provides motivational messages based on `fitnessGoal` (e.g., “Keep up the great work on your weight loss journey!”).
+
+- **Analytics**:
+  - Tracks user demographics (`age`, `gender`, `activityLevel`) and onboarding metrics (`onboardingStartedAt`, `onboardingCompletedAt`).
+
+---
+
+### Summary of Firestore Updates
+- **Initial Setup (Post-Sign-Up)**: Creates the user’s document with `uid`, `email`, `createdAt`.
+- **Welcome Step**: Adds `onboardingStartedAt`, sets `onboardingStep: "welcome"`.
+- **Personal Details Step**: Adds `age`, `gender`, `height`, `weight`, sets `onboardingStep: "personalDetails"`.
+- **Fitness Goals Step**: Adds `fitnessGoal`, `targetWeight`, sets `onboardingStep: "fitnessGoals"`.
+- **Activity Level Step**: Adds `activityLevel`, sets `onboardingStep: "activityLevel"`.
+- **Dietary Preferences Step**: Adds `dietaryPreference`, sets `onboardingStep: "dietaryPreferences"`.
+- **Payment/Trial Step**: Adds `subscriptionStatus`, `trialEndDate`, sets `onboardingStep: "payment"`.
+- **Final Step**: Sets `onboardingComplete: true`, adds `onboardingCompletedAt`, sets `onboardingStep: "final"`.
+
+This structure ensures all onboarding data is stored in Firestore, enabling the app to generate a personalized plan and enhance the user experience. Let me know if you’d like to proceed with implementing this in code or explore another aspect!

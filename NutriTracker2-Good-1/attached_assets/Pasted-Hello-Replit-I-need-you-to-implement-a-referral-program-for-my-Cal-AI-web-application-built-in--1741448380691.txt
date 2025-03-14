@@ -1,0 +1,66 @@
+Hello Replit,
+
+I need you to implement a referral program for my "Cal AI" web application (built in React). The feature should work as follows: when a user refers someone, and that new user signs up using the referrer's unique referral code, the referrer gets 10 days of free premium access added to their account. However, the referred user (the new user) does not receive the 10-day premium access. Below are the detailed steps for implementing this on both the frontend and backend, ensuring the referral system is user-friendly and secure.
+
+Requirements Overview
+Referral Reward: When a user refers a new user who successfully signs up, the referrer gets 10 days of free premium access added to their account. The referred user does not get any free premium access.
+Frontend: Add a "Refer a Friend" section in the app where users can see their unique referral code and share it. Display the number of successful referrals.
+Backend: Generate unique referral codes for each user, track referrals, and manage premium access duration for the referrer.
+Frontend Implementation
+Create a "Refer a Friend" Section:
+Add a new section under the existing "Preferences" section in the app (below the toggles for "Add burned calories to daily goal" and "Show your daily calories and macros on the lock screen and on dynamic island").
+The section should have a heading "Refer a Friend" in a bold font, matching the style of other headings in the app (e.g., font-semibold).
+Below the heading, add a short description: "Share your code and earn 10 days of free premium!" in a smaller, grayed-out font (e.g., text-sm text-gray-500).
+Display the user’s unique referral code in a read-only input field (e.g., styled with w-full p-2 mt-2 border rounded) to match the app’s existing input design.
+Add a "Copy Code" button below the input field (e.g., styled with w-full py-2 bg-black text-white rounded) that copies the referral code to the clipboard when clicked and shows a brief confirmation message (e.g., "Code copied!" in a toast).
+Below the button, show the number of successful referrals with text like "Referrals: 2" in a smaller font (e.g., text-sm).
+Fetch Referral Data:
+When the user loads the Preferences page, fetch their unique referral code and the number of successful referrals from the backend.
+Display a loading state (e.g., "Loading...") in the referral section until the data is fetched.
+If there’s an error fetching the data, show a fallback message like "Unable to load referral info" in grayed-out text.
+Premium Status Update:
+If the user has earned premium access through referrals, update the UI to reflect their premium status elsewhere in the app (e.g., in the trial notice section, change "Your trial ends tomorrow!!" to "Premium Access: 10 days remaining" if applicable).
+Ensure the premium status updates dynamically when a new referral is successful (e.g., after the backend confirms a new signup).
+Backend Implementation
+Set Up a Backend Database:
+Use a database to store user information (e.g., Firebase Firestore, Supabase, or any backend you’re already using for user data).
+Add the following fields to each user’s record:
+referralCode: A unique string (e.g., 8 characters long, generated using a UUID library or similar).
+referrals: An integer tracking the number of successful referrals (default to 0).
+premiumUntil: A timestamp (e.g., Unix timestamp or ISO date) indicating the date until which the user has premium access (default to null for non-premium users).
+Generate Referral Codes:
+When a new user signs up, generate a unique referral code for them (e.g., a shortened UUID or random string).
+Store the code in the user’s database record under the referralCode field.
+Ensure the code is unique by checking against existing codes in the database before saving.
+Handle Referral Signups:
+During the signup process for a new user, add an optional field in the signup form for entering a referral code (e.g., labeled "Referral Code (optional)").
+When a new user signs up with a referral code:
+Validate the code by checking if it matches an existing user’s referralCode in the database.
+If the code is valid, increment the referrer’s referrals count by 1.
+Calculate the referrer’s new premium access:
+If the referrer has no premium access (premiumUntil is null or in the past), set premiumUntil to the current date + 10 days.
+If the referrer already has premium access, extend premiumUntil by adding 10 days to the existing date.
+Do not modify the referred user’s account for premium access—leave their premiumUntil as null unless they have a separate subscription.
+If the referral code is invalid or not provided, proceed with signup without applying any referral logic.
+Provide Referral Data Endpoint:
+Create an API endpoint (e.g., /api/user/referral) that returns the user’s referral code and number of successful referrals.
+Example response: { "referralCode": "CAL12345", "referrals": 2 }.
+Ensure the endpoint is secured (e.g., requires authentication) so only the logged-in user can access their own referral data.
+Provide Premium Status Endpoint:
+Create an API endpoint (e.g., /api/user/premium) that returns the user’s premium status, including the premiumUntil timestamp.
+Example response: { "isPremium": true, "premiumUntil": "2025-03-18T00:00:00Z" }.
+Use this to update the frontend dynamically when premium access changes due to referrals.
+Additional Notes
+User Experience:
+Ensure the referral code is easy to share (e.g., clicking "Copy Code" copies the code to the clipboard and shows a confirmation).
+Notify the referrer when a referral is successful (e.g., via an in-app notification or email: "Your friend signed up! You’ve earned 10 days of premium!").
+Security:
+Prevent abuse by ensuring one referral code can’t be reused by the same new user (e.g., track used codes per signup).
+Validate that the referrer and referee are different users (e.g., compare user IDs or email addresses).
+Edge Cases:
+If a user’s premiumUntil is in the past or null, treat them as non-premium until a referral extends it.
+Handle cases where the backend fails to update premium status by logging errors and notifying the user to try again.
+Testing:
+Test the referral flow by signing up as a new user with a valid referral code and verifying the referrer gets 10 days of premium, while the new user does not.
+Test the UI to ensure the referral code and count display correctly, and the premium status updates in the app.
+Please implement this referral program as described, focusing on the frontend and backend requirements. Provide a confirmation (e.g., updated code or a screenshot) showing the "Refer a Friend" section and a test case where a referrer’s premium access is extended by 10 days. Thank you!

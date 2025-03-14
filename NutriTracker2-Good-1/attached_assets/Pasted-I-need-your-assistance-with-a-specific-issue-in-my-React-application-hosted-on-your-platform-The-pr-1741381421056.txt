@@ -1,0 +1,55 @@
+I need your assistance with a specific issue in my React application hosted on your platform. The problem is related to the "Water Settings" modal, where a scroll wheel is used to select a water intake value (e.g., 1, 2, 3, up to 100, plus a "Custom" option). Currently, there is no visible divider or highlight to clearly indicate which number is selected when scrolling through the options. The reference image provided (attached or described below) shows a plain list of numbers without a separator, but based on user feedback and design intent, a visible divider is expected to enhance the user experience.
+
+Problem Description
+Issue: When scrolling the list of options in the wheel picker, there is either no visible line or a thin, transparent line that is barely noticeable, making it difficult for users to determine the selected value. The intended design should include a prominent divider (e.g., a background highlight with borders) to mark the selected option, similar to the light gray bar with borders seen in earlier reference images.
+Current Behavior: The wheel-picker-highlight class in the code is supposed to provide a background (bg-gray-300) and thick black borders (border-t-4 border-b-4 border-black) to indicate the selected value, but it is not rendering correctly or is being overridden, resulting in no visible separator.
+Reference Image: The attached image shows the "Water Settings" modal with a serving size of "89 fl oz (11.1 cups)" and a scroll wheel displaying numbers like 1, 2, 3, etc., but no divider is visible around the selected value (e.g., 89 should be highlighted).
+Expected Behavior
+A clear, prominent divider should appear around the selected value in the scroll wheel, consisting of:
+A light gray background (e.g., bg-gray-300 or darker if needed) to highlight the selected area.
+Thick black borders (e.g., border-t-4 border-b-4 border-black) to serve as a visible separator.
+The divider should move with the selected value as the user scrolls, snapping to the center of the wheel picker, and be fully opaque (opacity-100) to avoid transparency issues.
+The selected value should be bold and black (font-semibold text-black), while non-selected values should remain faded (e.g., text-gray-400).
+Code Context
+The relevant component is the Home function in the main JSX file, specifically the "Water Settings" modal section.
+The scroll wheel is implemented using a div with the class wheel-picker-container, and each option is a div with the class wheel-picker-item. The highlight is defined by the wheel-picker-highlight class.
+Current wheel-picker-highlight styling:
+css
+
+Collapse
+
+Wrap
+
+Copy
+.wheel-picker-highlight {
+  position: absolute;
+  top-1/2;
+  left-0;
+  right-0;
+  height: 48px; /* Matches h-12 */
+  background-color: #d1d5db; /* bg-gray-300 */
+  border-top: 4px solid #000000; /* border-t-4 border-black */
+  border-bottom: 4px solid #000000; /* border-b-4 border-black */
+  transform: translateY(-50%);
+  pointer-events: none;
+  opacity: 100;
+}
+The scroll logic in the useEffect hook calculates the selected index based on scrollTop and itemHeight (48px), updating the dailyGoalFlOz state.
+Steps to Fix
+Inspect and Debug:
+Use your browser’s developer tools (e.g., Chrome DevTools) to inspect the wheel-picker-highlight element in the "Water Settings" modal. Check if the styles are being applied or overridden by parent elements or browser defaults.
+If the highlight is not visible, ensure no CSS specificity issues or z-index conflicts are hiding it.
+Enhance Visibility:
+Ensure the wheel-picker-highlight class is correctly applied with bg-gray-300, border-t-4 border-b-4 border-black, and opacity-100.
+If the highlight is still not visible, increase the contrast by changing the background to bg-gray-400 or bg-gray-500 and/or thickening the borders to border-t-6 border-b-6.
+Add !important to the styles if necessary (e.g., background-color: #d1d5db !important;) to override any conflicting styles.
+Verify Rendering:
+Test the scroll wheel by scrolling through the options (e.g., from 1 to 100) and confirm that the highlight moves with the selected value and snaps to the center.
+Ensure the "Serving size" updates correctly (e.g., selecting "89" should display "89 fl oz (11.1 cups)").
+Fallback Solution:
+If the wheel-picker-highlight approach fails due to rendering issues, consider adding an inline style to the selected wheel-picker-item (e.g., dynamically apply background-color and border styles to the selected item using the wheel-picker-selected class).
+Additional Notes
+The rest of the application (e.g., macro cards, water tracking, etc.) should remain unaffected.
+If the issue persists, it might be related to Replit’s rendering environment or a CSS conflict—please log any errors or inspect the DOM to identify the root cause.
+Please attach the updated code or a screenshot of the fixed modal for verification.
+Thank you for your help in re

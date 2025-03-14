@@ -1,0 +1,93 @@
+Prompt to Replit
+Project Goal
+Build a full-stack “Food Database” feature where users can:
+
+See a list of suggested ingredients (with calories, protein, carbs, fats).
+Tap “Log empty food” to create a brand-new food (name + macronutrients).
+Add ingredients to that new food from the suggested ingredients list.
+Reuse any newly created food as an ingredient in other foods/meals.
+Use whatever framework you prefer on the frontend (React, Next.js, or React Native) and Node.js/Express (or similar) on the backend. Please focus on replicating the UI flow from the attached screenshots:
+
+Food Database Screen
+
+Top Search Field: “Describe what you ate” (or “Search for an ingredient”)
+Tabs: “All,” “My meals,” “My foods,” “Saved scans”
+By default, user is on the All tab, which shows a list of suggested ingredients (Peanut Butter, Avocado, Egg, etc.).
+A “Log empty food” button that, when tapped, lets the user create a new food item with name, calories, protein, carbs, and fats.
+Add Ingredient Flow
+
+After creating a new food, user can tap “Add ingredients” to select from the same suggested ingredients list or any newly created foods.
+Selected Food Screen
+
+Shows the food name, serving count (with “+” / “-” buttons), and macronutrients (Calories, Protein, Carbs, Fats).
+Has an “Add +” button or tile to add more ingredients to this specific food.
+The newly created food should then appear in the same “suggested ingredients” list so that it can be reused as an ingredient for future foods or meals.
+
+Data Model & API Requirements
+Food Model
+
+name: string
+calories: number
+protein: number
+carbs: number
+fats: number
+ingredients: [ { type: ObjectId, ref: 'Food' } ] (to store references to other foods as ingredients)
+Endpoints (Node.js/Express Example)
+
+POST /api/foods
+Creates a new food. Request body includes name, calories, protein, carbs, fats, and optionally an array of ingredient IDs.
+GET /api/foods
+Returns a list of all foods (for “All” tab, plus search).
+GET /api/foods/:id
+Returns a single food by ID, including its ingredients.
+PUT /api/foods/:id
+Updates an existing food (e.g., to add ingredients after creation).
+DELETE /api/foods/:id (optional)
+Deletes a food if needed.
+Suggested Ingredients
+
+Seed your database with some “default” ingredients (e.g., Egg, Avocado, Peanut Butter). These appear under “Suggestions” in the UI.
+Frontend Requirements
+Food Database Screen:
+
+A search bar at the top to filter the list.
+Tabs (“All,” “My meals,” “My foods,” “Saved scans”)—for now, only the “All” tab is truly functional.
+A button “Log empty food” that opens a New Food form (with name, calories, protein, carbs, fats).
+Once the user saves the new food, show it in the list below as well.
+Selected Food Screen:
+
+Displays the chosen food’s macronutrient info.
+Has a quantity selector (“- 1 +”).
+An “Add ingredient” button that opens a list of all foods/ingredients.
+When the user taps an ingredient to add, update the food’s ingredients array in the backend.
+Styling:
+
+Try to match the screenshots: minimalistic, large text for macros, plus buttons on the right, etc.
+Use your preferred styling approach (CSS modules, styled-components, React Native styling, etc.).
+Implementation Outline
+Backend
+
+Create a simple Food schema (Mongoose or similar ORM).
+Implement CRUD routes in Express.
+Seed the database with initial “suggested ingredients.”
+Frontend
+
+FoodDatabase component/page:
+Fetch /api/foods on mount to display the suggested ingredients.
+Button “Log empty food” triggers a form modal or new screen for creating a new food.
+On submit, POST /api/foods to create, then refetch the list.
+SelectedFood component/page:
+Fetch a single food by ID to display macros.
+Provide an “Add ingredient” button that fetches all foods (or suggested ingredients) and updates the selected food with a PUT /api/foods/:id.
+Reusability
+
+Any newly created food should also appear in the “suggested ingredients” list (which is basically the same /api/foods response).
+Instructions to Replit
+Generate a Node.js/Express backend (with Mongoose or any in-memory data if preferred) containing the routes described.
+Generate a React or React Native frontend with pages/components for:
+FoodDatabase (showing “All” list and “Log empty food” form).
+SelectedFood (showing macros and allowing “Add ingredient”).
+Seed the database with a few default foods (Egg, Peanut Butter, Avocado, etc.).
+Demonstrate adding a new food and then using it as an ingredient in another food.
+Clone the general layout from the four attached screenshots if possible (white background, big macro fields, “+” button, etc.).
+Use descriptive variable names, and please provide inline comments explaining key sections of the code so it’s easy to follow. Make sure the final result is a working CRUD app that I can run on Replit with minimal setup.

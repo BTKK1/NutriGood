@@ -1,0 +1,54 @@
+Configure free trials
+Delay payments on subscriptions using free trial periods.
+Stripe doesn’t set a specific limit on a free trial length. Most businesses use shorter trials (such as 30 days), but you can set longer periods. However, consider:
+
+Keeping payment methods valid for post-trial charges
+Potential impact on conversion rates with longer trials
+
+Stripe-hosted page
+
+Embedded form
+
+Embedded components
+Public preview
+You can configure a Checkout Session to start a customer’s subscription with a free trial by passing one of the following parameters:
+
+subscription_data.trial_period_days, the length (in days) of your free trial.
+subscription_data.trial_end, a Unix timestamp representing the end of the trial period.
+Command Line
+Select a language
+
+
+
+curl https://api.stripe.com/v1/checkout/sessions \
+  -u "sk_test_51QoPXIJaqZSiighanzToMT9Ic3oP90iUyIece4XCIvi7ds5lgRjZsY6WyKMmYyWCQ1QeacKw4RcCACbrxGBpDhhm00UFJwYs3K:" \
+  -d mode=subscription \
+  -d ui_mode=custom \
+  --data-urlencode return_url="https://example.com/return" \
+  -d "line_items[0][price]"={{PRICE_ID}} \
+  -d "line_items[0][quantity]"=1 \
+  -d "subscription_data[trial_period_days]"=30
+On the front end, recurring.trial contains the details of the session’s trial period.
+
+Free trials without collecting a payment method
+By default, Checkout Sessions collect a payment method to use after the trial ends. You can sign customers up for free trials without collecting payment details by passing payment_method_collection=if_required.
+
+Choose whether to cancel or pause the subscription if the customer doesn’t provide a payment method before the trial ends by passing trial_settings.end_behavior.missing_payment_method.
+
+Cancel subscription-If the free trial subscription ends without a payment method, it cancels immediately. You can create another subscription if the customer decides to subscribe to a paid plan in the future.
+Pause subscription-If the free trial subscription ends without a payment method, it pauses and doesn’t cycle until it’s resumed. When a subscription is paused, it doesn’t generate invoices (unlike when a subscription’s payment collection is paused). When your customer adds their payment method after the subscription has paused, you can resume the same subscription. The subscription can remain paused indefinitely.
+Command Line
+Select a language
+
+
+
+curl https://api.stripe.com/v1/checkout/sessions \
+  -u "sk_test_51QoPXIJaqZSiighanzToMT9Ic3oP90iUyIece4XCIvi7ds5lgRjZsY6WyKMmYyWCQ1QeacKw4RcCACbrxGBpDhhm00UFJwYs3K:" \
+  -d mode=subscription \
+  -d ui_mode=custom \
+  --data-urlencode return_url="https://example.com/return" \
+  -d "line_items[0][price]"={{PRICE_ID}} \
+  -d "line_items[0][quantity]"=1 \
+  -d "subscription_data[trial_period_days]"=30 \
+  -d "subscription_data[trial_settings][end_behavior][missing_payment_method]"=cancel \
+  -d payment_method_collection=if_required

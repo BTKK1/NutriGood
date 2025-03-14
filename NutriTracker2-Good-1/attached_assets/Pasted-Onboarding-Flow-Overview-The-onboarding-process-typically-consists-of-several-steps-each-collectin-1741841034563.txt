@@ -1,0 +1,159 @@
+Onboarding Flow Overview
+The onboarding process typically consists of several steps, each collecting specific data from the user. Based on the context of your project (Saraat AI), I’ll assume the following common onboarding steps for a fitness app:
+
+Welcome Step: Introduction to the app (no data collected, but sets the tone).
+Personal Details Step: Collects basic user information (e.g., age, gender, height, weight).
+Fitness Goals Step: Defines the user’s objectives (e.g., weight loss, muscle gain).
+Activity Level Step: Assesses the user’s current activity level (e.g., sedentary, active).
+Dietary Preferences Step: Gathers dietary restrictions or preferences (e.g., vegetarian, allergies).
+Payment/Trial Step: Handles subscription or trial setup (affects access to features).
+Final Step: Confirmation and redirection to /home.
+Each step updates the user’s data in a structured way (e.g., stored in Firebase Firestore under the user’s document) and influences their fitness plan, goals, and overall app experience.
+
+How Each Onboarding Step Affects the Data, Plan, and Other Aspects
+1. Welcome Step
+Purpose: Introduces the user to Saraat AI and explains the onboarding process.
+Data Impact:
+No direct data collected: This step doesn’t collect user-specific data but may log that the user has started onboarding (e.g., a timestamp in the user’s document like onboardingStartedAt: new Date()).
+User Document: A basic user document might already exist in Firestore after account creation (e.g., { uid, email, createdAt }). This step might update a field like onboardingStep: "welcome" to track progress.
+Plan Impact:
+None: Since no data is collected, the fitness plan isn’t affected yet.
+Other Aspects ("Etc."):
+User Engagement: Sets the tone for the app experience, encouraging the user to provide accurate data in subsequent steps.
+Analytics: Logs the user’s entry into the onboarding flow (e.g., for tracking drop-off rates in analytics tools like Firebase Analytics).
+2. Personal Details Step (Age, Gender, Height, Weight)
+Purpose: Collects foundational data to personalize the user’s fitness and nutrition plan.
+Data Impact:
+User Document Updates:
+age: number (e.g., 30) – Used to calculate metabolic rates and age-appropriate recommendations.
+gender: string (e.g., "female") – Influences calorie needs, macronutrient ratios, and exercise recommendations (e.g., women may need more focus on iron intake).
+height: number (e.g., 170 cm) – Used in BMI calculations and to estimate calorie needs.
+weight: number (e.g., 65 kg) – Critical for BMI, calorie needs, and tracking progress over time.
+onboardingStep: "personalDetails" – Tracks progress in the onboarding flow.
+Storage: These fields are added to the user’s document in Firestore (e.g., users/{uid}).
+Plan Impact:
+Basal Metabolic Rate (BMR) Calculation: Age, gender, height, and weight are used to calculate the user’s BMR (e.g., using the Harris-Benedict equation). For example:
+A 30-year-old female, 170 cm, 65 kg might have a BMR of ~1,400 kcal/day.
+Initial Calorie Goal: The BMR is a starting point for setting a daily calorie goal, which will be adjusted based on activity level and fitness goals in later steps.
+Exercise Recommendations: Gender and age influence exercise types (e.g., older users might get lower-impact exercises like yoga, while younger users might get high-intensity options).
+Other Aspects:
+Analytics: These data points feed into user demographics for analytics (e.g., average age of users).
+Goal Tracking: Weight is the baseline for tracking progress (e.g., if the goal is weight loss, the app will compare future weights to this initial value).
+Recommendations: Height and weight influence equipment recommendations (e.g., a taller user might be recommended a longer yoga mat).
+3. Fitness Goals Step (e.g., Weight Loss, Muscle Gain, General Health)
+Purpose: Defines the user’s primary objective to tailor their plan and goals.
+Data Impact:
+User Document Updates:
+fitnessGoal: string (e.g., "weightLoss") – Indicates the user’s primary goal.
+targetWeight: number (optional, e.g., 60 kg if the goal is weight loss) – If applicable, stores the user’s desired weight.
+onboardingStep: "fitnessGoals" – Tracks progress.
+Storage: Updated in the user’s Firestore document.
+Plan Impact:
+Calorie Adjustment:
+Weight Loss: The app reduces the daily calorie goal below the user’s maintenance level (e.g., BMR + activity level - 500 kcal for a 500 kcal/day deficit).
+Muscle Gain: Increases calorie intake above maintenance (e.g., +300 kcal/day) with a focus on protein.
+General Health: Sets calorie intake at maintenance level for balance.
+Macronutrient Ratios:
+Weight Loss: Higher protein (e.g., 35% protein, 35% carbs, 30% fats) to preserve muscle mass.
+Muscle Gain: Higher protein and carbs (e.g., 30% protein, 50% carbs, 20% fats) for muscle growth.
+General Health: Balanced macros (e.g., 30% protein, 40% carbs, 30% fats).
+Exercise Plan:
+Weight Loss: Emphasizes cardio (e.g., running) and HIIT to burn calories.
+Muscle Gain: Focuses on strength training (e.g., weightlifting) with progressive overload.
+General Health: A mix of cardio, strength, and flexibility exercises.
+Other Aspects:
+Goal Tracking: The app sets specific metrics to track (e.g., weight loss tracks weekly weight changes, muscle gain tracks strength increases).
+Motivational Messages: The app tailors notifications (e.g., "You’re 2 kg closer to your weight loss goal!" for weight loss users).
+Recommendations: Influences meal and exercise suggestions (e.g., high-protein meals for muscle gain users).
+4. Activity Level Step (e.g., Sedentary, Moderately Active, Very Active)
+Purpose: Assesses the user’s current activity level to adjust their calorie needs and exercise plan.
+Data Impact:
+User Document Updates:
+activityLevel: string (e.g., "sedentary") – Indicates how active the user is.
+onboardingStep: "activityLevel" – Tracks progress.
+Storage: Updated in Firestore.
+Plan Impact:
+Total Daily Energy Expenditure (TDEE):
+The app multiplies the BMR by an activity factor:
+Sedentary (little to no exercise): BMR × 1.2
+Moderately Active (light exercise 3–5 days/week): BMR × 1.55
+Very Active (intense exercise 6–7 days/week): BMR × 1.9
+Example: A user with a BMR of 1,400 kcal/day who is moderately active has a TDEE of 1,400 × 1.55 = 2,170 kcal/day.
+Adjusted Calorie Goal:
+Combines TDEE with the fitness goal:
+Weight Loss: TDEE - 500 kcal (e.g., 2,170 - 500 = 1,670 kcal/day).
+Muscle Gain: TDEE + 300 kcal (e.g., 2,170 + 300 = 2,470 kcal/day).
+General Health: TDEE (e.g., 2,170 kcal/day).
+Exercise Plan:
+Sedentary: Starts with beginner-friendly exercises (e.g., walking 30 minutes/day).
+Moderately Active: Includes moderate cardio and strength (e.g., 3 days cardio, 2 days strength).
+Very Active: Advanced plan with more intense workouts (e.g., 5 days of mixed high-intensity training).
+Other Aspects:
+Progress Monitoring: Activity level sets a baseline for tracking improvements (e.g., a sedentary user might aim to become moderately active).
+Recommendations: Influences rest day suggestions (e.g., very active users get more recovery days).
+Analytics: Helps segment users by activity level for insights (e.g., “80% of users are sedentary”).
+5. Dietary Preferences Step (e.g., Vegetarian, Vegan, Allergies)
+Purpose: Collects dietary restrictions and preferences to customize meal plans.
+Data Impact:
+User Document Updates:
+dietaryPreference: string (e.g., "vegetarian") – Indicates the user’s diet type.
+allergies: string[] (e.g., ["peanuts", "dairy"]) – Lists food allergies or intolerances.
+onboardingStep: "dietaryPreferences" – Tracks progress.
+Storage: Updated in Firestore.
+Plan Impact:
+Meal Plan Customization:
+Vegetarian: Excludes meat from meal suggestions (e.g., recommends tofu stir-fry instead of chicken stir-fry).
+Vegan: Excludes all animal products (e.g., suggests plant-based protein sources like lentils).
+Allergies: Filters out meals containing allergens (e.g., no peanut-based recipes for a peanut-allergic user).
+Macronutrient Adjustments:
+Vegetarian/Vegan: Increases plant-based protein sources (e.g., beans, tempeh) to meet protein goals.
+Allergies: Adjusts recipes to avoid allergens while maintaining nutritional balance (e.g., uses almond milk if dairy-allergic, but only if not allergic to almonds).
+Calorie and Nutrient Goals:
+Ensures the user meets their calorie and macro goals despite dietary restrictions (e.g., a vegan user might get more legumes to hit protein targets).
+Other Aspects:
+Food Database: Filters the app’s food database to exclude restricted items (e.g., no dairy in the “Add Ingredient” page for dairy-allergic users).
+Notifications: Warns users if they log a food that conflicts with their preferences/allergies (e.g., “This recipe contains dairy, which you’re allergic to!”).
+Recommendations: Suggests alternative foods (e.g., a vegan user might get a recommendation for a plant-based protein powder).
+
+( For testing ) 
+After clicking skip to home the user's plan and data should be applied to his actual app affecting his plan calories carbs fat protein age height
+
+
+
+7. Final Step (Confirmation and Redirection)
+Purpose: Confirms the user has completed onboarding and redirects them to /home.
+Data Impact:
+User Document Updates:
+onboardingComplete: boolean (set to true) – Marks the user as having finished onboarding.
+onboardingCompletedAt: Date (e.g., current timestamp) – Logs when onboarding was completed.
+Storage: Updated in Firestore.
+Plan Impact:
+Finalization: The app finalizes the user’s fitness and nutrition plan based on all collected data:
+Example: A 30-year-old female, 170 cm, 65 kg, moderately active, aiming for weight loss, vegetarian, on a premium plan might get a plan of 1,670 kcal/day, 35% protein, with vegetarian meals and a mix of cardio/HIIT workouts.
+Activation: The plan is now active and visible in the /home page (e.g., daily calorie goal, recommended meals, workout schedule).
+Other Aspects:
+User Experience: The app transitions to the main interface, showing the user’s plan, goals, and tracking features.
+Notifications: Sends a welcome message (e.g., “Welcome to Saraat AI! Let’s start your fitness journey.”).
+Analytics: Logs onboarding completion rate (e.g., “90% of users completed onboarding”).
+Summary of Data Impact
+The onboarding process updates the user’s Firestore document (users/{uid}) with the following fields:
+
+age, gender, height, weight (Personal Details).
+fitnessGoal, targetWeight (Fitness Goals).
+activityLevel (Activity Level).
+dietaryPreference, allergies (Dietary Preferences).
+subscriptionStatus, trialEndDate, premiumUntil (Payment/Trial).
+onboardingComplete, onboardingCompletedAt (Final Step).
+onboardingStep (updated at each step to track progress).
+Summary of Plan Impact
+Calorie Goals: Calculated using BMR (from age, gender, height, weight) × activity factor, adjusted for fitness goals (e.g., deficit for weight loss, surplus for muscle gain).
+Macronutrient Ratios: Tailored based on fitness goals and dietary preferences (e.g., high protein for muscle gain, plant-based for vegetarians).
+Exercise Plan: Customized by fitness goal and activity level (e.g., cardio for weight loss, strength for muscle gain, beginner exercises for sedentary users).
+Meal Plan: Filtered and adjusted for dietary preferences/allergies, with premium users getting more personalized options.
+Summary of Other Impacts ("Etc.")
+Goal Tracking: Sets baselines for tracking progress (e.g., initial weight, activity level) and tailors metrics (e.g., weight loss tracks weight, muscle gain tracks strength).
+Recommendations: Personalizes suggestions for food, exercises, and equipment based on user data (e.g., vegetarian meals, low-impact exercises for older users).
+Notifications: Sends tailored messages (e.g., allergy warnings, trial expiration reminders, motivational messages based on goals).
+Analytics: Feeds data into analytics for insights (e.g., user demographics, onboarding completion rates, trial-to-premium conversion).
+App Behavior: Adjusts feature access (e.g., premium vs. free), filters content (e.g., food database excludes allergens), and personalizes the UI (e.g., shows relevant goals on the home page).
+This structure ensures the onboarding process builds a comprehensive user profile, enabling Saraat AI to deliver a personalized fitness and wellness experience while minimizing complexity and errors. 

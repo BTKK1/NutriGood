@@ -1,0 +1,99 @@
+1. **Frontend: Health Score Screen**
+   - Create a new component in `/frontend/src/components/HealthScore.jsx` for the health score screen, matching the design from the screenshot:
+     - Display a header "Health Score" in bold, black text, with a heart icon (❤️) and a progress bar showing the user’s health score (e.g., "7/10") in green, styled with Tailwind CSS (`bg-white`, `rounded-lg`, `shadow-md`).
+     - Calculate the health score dynamically based on the user’s onboarding answers (e.g., gender, workouts per week, height, weight, goal, weight loss speed, dietary prefs). Use a scoring system, such as:
+       - +2 points for 6+ workouts/week (dedicated athlete), +1 for 3-5 workouts, 0 for 0-2.
+       - +2 points for a balanced goal (maintain or lose at moderate speed 0.8 kg/week), +1 for extreme goals (0.1 kg or 1.5 kg/week), 0 for gain weight.
+       - +1 point for healthy BMI (18.5–24.9), 0 for underweight/overweight, -1 for obese (based on height/weight).
+       - +1 point for vegetarian/vegan/pescatarian diets, 0 for default.
+       - Cap the score at 10, with 0 as the minimum.
+     - Ensure the layout includes a back arrow (⬅️) and progress bar at the top, centered content, and responsiveness with Tailwind CSS.
+   - Fetch the user’s data from the backend via GET `/api/health-score` to calculate and display the score, using `fetch` or `axios` in the `useEffect` hook.
+
+2. **Backend: Health Score Endpoint**
+   - In `/backend/routes/healthScore.js`, create a GET endpoint `/api/health-score` to calculate the user’s health score based on their onboarding data in the `users` table:
+     - Retrieve `gender`, `workoutsPerWeek`, `height`, `weight`, `goal`, `weightSpeed`, and `dietaryPrefs` from the `users` table.
+     - Apply the scoring logic described above to calculate a health score (0–10).
+     - Return the score as JSON (e.g., `{ score: 7, max: 10 }`), ensuring error handling and validation.
+
+3. **Frontend: How to Reach Your Goals Screen**
+   - Create a new component in `/frontend/src/components/GoalsGuide.jsx` for the "How to reach your goals:" screen, matching the design from the screenshot:
+     - Display the title "How to reach your goals:" in bold, black text.
+     - Include four cards with icons and text, styled with Tailwind CSS (`bg-white`, `rounded-lg`, `shadow-md`):
+       - ❤️ "Use health scores to improve your routine"
+       - 🥑 "Track your food"
+       - 🔥 "Follow your daily calorie recommendation"
+       - 🍞⚡💧 "Balance your carbs, proteins, and fat"
+     - Add a section below the cards with "Plan based on the following sources, among other peer-reviewed medical studies:" and a list:
+       - "Basal metabolic rate"
+       - "Calorie counting – Harvard"
+       - "International Society of Sports Nutrition"
+       - "National Institutes of Health"
+     - Include a "Let’s get started!" button (black with white text, rounded corners) at the bottom to navigate to the payment page.
+     - Ensure the layout includes a back arrow (⬅️) and progress bar, centered content, and responsiveness with Tailwind CSS.
+   - Dynamically adjust the content based on user answers (e.g., emphasize tracking food for weight loss goals, balance macros for dietary prefs). Fetch data from the backend via GET `/api/goals-guide` if needed.
+
+4. **Backend: Goals Guide Endpoint (Optional)**
+   - In `/backend/routes/goalsGuide.js`, create a GET endpoint `/api/goals-guide` to provide tailored recommendations based on the user’s `goal`, `weightSpeed`, and `dietaryPrefs` from the `users` table, returning JSON with suggestions for the cards or list. If static content is sufficient, this step can be skipped, but ensure the frontend reflects user-specific data where applicable.
+
+5. **Frontend: Payment Page with Stripe Integration**
+   - Create a new component in `/frontend/src/components/Payment.jsx` for the payment screen, matching the designs from the screenshots:
+     - For the first payment screen ("We want you to try Saraat AI for free."):
+       - Display "We want you to try Saraat AI for free." in bold, black text.
+       - Show an image of a phone with the app interface (use the existing image or a mockup from `/public` or `/frontend/src/assets`).
+       - Include a checkbox "No Payment Due Now" (✔) and a "Try for $0.00" button (black with white text, rounded corners) to start the free trial.
+       - Add text "Just SAR 129.99 per year (SAR 10.83/mo)" in gray below the button.
+       - Include a "Restore" link in gray at the top-right for subscription recovery.
+     - For the second payment screen ("We’ll send you a reminder before your free trial ends"):
+       - Display "We’ll send you a reminder before your free trial ends" in bold, black text.
+       - Show a bell icon (🔔) with a red badge (1) in the center.
+       - Include a checkbox "No Payment Due Now" (✔) and a "Continue for FREE" button (black with white text, rounded corners).
+       - Add text "Just SAR 129.99 per year (SAR 10.83/mo)" in gray below the button.
+       - Include a "Restore" link in gray at the top-right.
+     - For the third payment screen ("Start your 3-day FREE trial to continue."):
+       - Display "Start your 3-day FREE trial to continue." in bold, black text.
+       - Show a timeline with three points:
+         - 🗝️ "Today: Unlock all the app’s features like AI calorie scanning and more."
+         - 🔔 "In 2 Days – Reminder: We’ll send you a reminder that your trial is ending soon."
+         - 👑 "In 3 Days – Billing Starts: You’ll be charged on 8 Mar 2025 unless you cancel anytime before."
+       - Include radio buttons for subscription plans:
+         - "Monthly: SAR 39.99/mo"
+         - "Yearly: SAR 10.83/mo" (pre-selected with a checkmark)
+       - Include a checkbox "No Payment Due Now" (✔) and a "Start My 3-Day Free Trial" button (black with white text, rounded corners).
+       - Add text "3 days free, then SAR 129.99 per year (SAR 10.83/mo)" in gray below the button.
+       - Include a "Restore" link in gray at the top-right.
+     - Integrate Stripe for payment processing:
+       - Install the Stripe JavaScript library (`@stripe/stripe-js`) and Node.js package (`stripe`) in Replit.
+       - In `Payment.jsx`, use Stripe’s React components (`Elements`, `CardElement`, etc.) or Stripe.js to handle the free trial signup, ensuring no payment is collected initially but setting up a subscription for SAR 129.99/year (SAR 10.83/mo) after the 3-day trial.
+       - Configure Stripe in the backend (`/backend/server.js` or `/backend/routes/payment.js`) with your Stripe secret key (stored securely, e.g., as an environment variable in Replit) to create a customer, set up a subscription, and handle webhooks for trial expiration and billing.
+     - Ensure each screen includes a back arrow (⬅️) and progress bar, centered content, and responsiveness with Tailwind CSS.
+   - Upon successful trial signup, redirect the user to the account creation page (`/create-account`).
+
+6. **Backend: Payment and Subscription Logic**
+   - In `/backend/routes/payment.js`, create endpoints to handle Stripe integration:
+     - POST `/api/payment/trial`: Accepts user data (e.g., email) to create a Stripe customer, set up a 3-day free trial subscription for SAR 129.99/year (billed SAR 10.83/mo after trial), and store the subscription ID in the `users` table (add a `subscriptionId` column).
+     - Use Stripe webhooks to handle trial expiration and billing events, updating the user’s status in the database.
+     - Ensure error handling, validation, and secure storage of Stripe keys (use environment variables in Replit).
+
+7. **Frontend: Create an Account Page**
+   - Create a new component in `/frontend/src/components/CreateAccount.jsx` for the "Create an account" screen, matching the design from the screenshot:
+     - Display "Create an account" in bold, black text.
+     - Include buttons for "Sign in with Apple" and "Sign in with Google," styled with their respective logos and Tailwind CSS (`bg-black`, `text-white`, `rounded-lg`, `shadow-md`).
+     - Ensure the layout includes a back arrow (⬅️) and progress bar, centered content, and responsiveness with Tailwind CSS.
+   - Integrate OAuth with Apple and Google Sign-In:
+     - Install necessary libraries (`react-google-login`, `react-apple-signin-auth`, or similar) in Replit.
+     - Use these libraries to handle authentication, creating or linking a user account in the backend, and redirecting to the homepage (`/home`) upon success.
+   - Fetch or send user data to the backend via POST `/api/auth/create` to store the account details (e.g., email, name) in the `users` table.
+
+8. **Backend: Authentication and Account Creation**
+   - In `/backend/routes/auth.js`, create a POST endpoint `/api/auth/create` to handle account creation via Apple/Google OAuth:
+     - Use OAuth tokens to verify the user, create a new record in the `users` table (or update an existing one), and return a JWT or session token for authentication.
+     - Ensure secure storage of user data, error handling, and validation.
+   - Update `/backend/db.js` to include an `authProvider` column (e.g., "Apple," "Google") and other relevant fields (e.g., `email`, `name`) in the `users` table.
+
+9. **Integration and Testing**
+   - Ensure all new components integrate seamlessly with the existing onboarding flow (back arrow, progress bar) and React Router setup in `/frontend/src/App.jsx`.
+   - Test the changes in Replit to verify each screen displays correctly, Stripe integration works for the free trial and subscription, OAuth authentication functions, and the UI remains responsive and consistent with the minimalist design (black, white, gray) from the screenshots. Use our custom "Saraat AI" logo throughout.
+   - Provide comments in the code for clarity and scalability, ensuring dynamic content reflects user answers and payment/subscription logic is secure.
+
+Once these updates are implemented and tested, the onboarding process will conclude with a payment setup for a 3-day free trial and account creation, redirecting users to the homepage after successful signup.

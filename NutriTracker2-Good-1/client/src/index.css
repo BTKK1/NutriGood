@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  /* Custom scale and transform utilities for scan guide */
+  .scale-175 {
+    transform: scale(1.75);
+  }
+  
+  .origin-top-center {
+    transform-origin: center top;
+  }
+
+  /* Custom wheel picker styles */
+  .wheel-picker-container {
+    @apply h-[250px] overflow-y-auto snap-y snap-mandatory no-scrollbar;
+    scroll-behavior: smooth;
+    mask-image: linear-gradient(
+      to bottom,
+      transparent,
+      black 25%,
+      black 75%,
+      transparent
+    );
+  }
+
+  .wheel-picker-container::-webkit-scrollbar {
+    display: none;
+  }
+
+  .wheel-picker-item {
+    @apply h-[50px] flex items-center justify-center text-xl text-gray-400 snap-center transition-all duration-200 cursor-default select-none;
+  }
+
+  .wheel-picker-selected {
+    @apply text-black text-3xl font-bold;
+  }
+
+  .wheel-picker-padding {
+    @apply h-[100px];
+  }
+
+  /* Horizontal scrolling */
+  .scroll-container {
+    @apply flex min-w-[200%];
+  }
+
+  .scroll-section {
+    @apply w-1/2 flex-shrink-0;
+  }
+}

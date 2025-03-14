@@ -1,0 +1,55 @@
+You are an expert fullstack developer with 30 years of experience, specializing in React.js for frontend development, Tailwind CSS for styling, and Firebase (Authentication, Firestore, Realtime Database, Cloud Functions) for backend development. You are currently working on the "Saraat AI" calorie tracking web application in Replit, following the detailed prompts provided earlier. The user has provided two additional screenshots (Widgets page and Main Dashboard) and requests the following updates: replicate the exact positioning, sizes, and design of the three navigation icons ("Home," "Analytics," "Settings") and the "+" icon from the bottom navigation bar, as well as the four boxes ("Log exercise," "Saved foods," "Food Database," "Scan food") that appear upon clicking the "+" icon. The positioning and sizes must match the original screenshots precisely, maintaining the minimalist black design and layout observed. No changes to functionality or backend are required unless necessary to support this visual replication. Follow these steps:
+
+#### Frontend Implementation
+- **Analysis**:
+  - Review the provided screenshots (Widgets page and Main Dashboard) to analyze the positioning and sizes of the navigation icons and the four boxes.
+  - Note the following:
+    - **Navigation Icons**: "Home," "Analytics," "Settings," and "+" are evenly spaced at the bottom, with the "+" icon on the far right. Each icon is approximately 24x24px, centered vertically, with a 10px gap between icons, and the navigation bar is fixed at the bottom with a height of ~60px.
+    - **Plus Icon**: The "+" icon is a black circle (~40x40px) with the "+" symbol inside, positioned at the bottom-right corner, aligned with the other icons.
+    - **Four Boxes**: Upon clicking the "+" icon, four white rounded cards (each ~100x100px) appear in a 2x2 grid layout. The boxes are labeled "Log exercise," "Saved foods," "Food Database," "Scan food," with icons centered inside. The grid has a 10px gap between boxes, and the overall layout is centered above the navigation bar, occupying ~200x200px total space.
+  - Ensure the design matches the light gray background, white cards, and black text/icons from the original.
+- **Structure Update**:
+  - Update `/frontend/src/components/App.jsx` and `/frontend/src/components/NavigationBar.jsx` (or create if not exists) to enforce the exact positioning and sizes of the navigation icons.
+  - Update `/frontend/src/components/WidgetsPage.jsx` or create a new modal component (e.g., `/frontend/src/components/PlusMenu.jsx`) to display the four boxes with the exact positioning and sizes when the "+" icon is clicked.
+- **Functionality**:
+  - Maintain existing navigation functionality (e.g., clicking "Home" goes to `/`, "Analytics" to `/analytics`, "Settings" to `/settings`).
+  - Ensure clicking the "+" icon opens the four-box menu, with each box navigable to the respective pages (`/log-exercise`, `/saved-foods`, `/food-database`, `/scan-food`) as implemented earlier.
+- **Implementation Steps**:
+  1. Open `/frontend/src/components/NavigationBar.jsx` (or create it if not exists) and ensure it uses a `flex` container with Tailwind classes:
+     - `fixed bottom-0 w-full h-15 bg-gray-200 flex justify-between items-center px-4` for the navigation bar.
+     - Add four icons with `w-6 h-6` (24x24px) for "Home," "Analytics," "Settings," and a `w-10 h-10` (40x40px) black circle with a "+" for the "+" icon.
+     - Use `@heroicons/react` icons: `HomeIcon`, `ChartBarIcon`, `CogIcon`, and `PlusIcon` with `className="w-6 h-6 text-black"` for the first three, and `className="w-10 h-10 bg-black rounded-full flex items-center justify-center text-white"` for the "+" icon.
+     - Set `gap-2.5` (10px) between icons using Tailwind.
+  2. Create `/frontend/src/components/PlusMenu.jsx` for the four-box menu:
+     - Use a `grid grid-cols-2 gap-2.5` container with Tailwind, centered with `absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-50 h-50` (200x200px total).
+     - Add four `div` elements, each with `w-24 h-24` (100x100px), `bg-white rounded-lg flex items-center justify-center flex-col` for the cards.
+     - Include icons (`PlusIcon`, `BookOpenIcon`, `SearchIcon`, `CameraIcon` from `@heroicons/react/24/outline`) with `w-6 h-6 text-black` and text labels below.
+     - Ensure the layout matches the 2x2 grid with 10px gaps.
+  3. Update `/frontend/src/App.jsx` to render `PlusMenu` conditionally when the "+" icon is clicked, using `useState` to toggle visibility.
+  4. Verify the positioning aligns with the screenshots by adjusting CSS if needed (e.g., use browser dev tools to match pixel-perfect layout).
+- **Testing**:
+  - Verify the navigation icons are positioned with 10px gaps, 24x24px size for the first three, and 40x40px for the "+" icon.
+  - Ensure the "+" icon click opens the four-box menu centered above the navigation bar.
+  - Confirm each box is 100x100px with a 10px gap, matching the 2x2 grid layout.
+  - Test responsiveness on mobile and desktop, ensuring the layout scales proportionally.
+  - Check that clicking each box navigates to the correct route.
+
+#### Backend Implementation
+- **Analysis**:
+  - No backend changes are required as this update focuses on visual replication.
+- **Structure Update**:
+  - Ensure existing Firebase routes (`/log-exercise`, `/saved-foods`, `/food-database`, `/scan-food`) are functional but do not need adjustment.
+- **Functionality**:
+  - Maintain existing data storage and retrieval for navigation-triggered pages.
+- **Implementation Steps**:
+  - Skip backend updates unless navigation routes fail to load.
+- **Testing**:
+  - Verify navigation routes still work after frontend adjustments.
+
+#### Additional Instructions
+- Provide detailed comments in the updated files explaining the positioning and size replication (e.g., "// Replicated exact 24x24px icon size with 10px gap for navigation bar").
+- Log a `console.log` in `NavigationBar.jsx` and `PlusMenu.jsx` to confirm rendering (e.g., `console.log('Navigation bar icons positioned');`).
+- Use pixel-perfect measurements from the screenshots (e.g., 24x24px, 40x40px, 100x100px) to ensure exact replication.
+- Avoid altering the existing color scheme or icon styles beyond matching the original black minimalist design.
+
+This prompt ensures the navigation icons and "+" icon, along with the four-box menu, are replicated with the exact positioning, sizes, and layout from the provided screenshots, maintaining the "Saraat AI" app's visual consistency.

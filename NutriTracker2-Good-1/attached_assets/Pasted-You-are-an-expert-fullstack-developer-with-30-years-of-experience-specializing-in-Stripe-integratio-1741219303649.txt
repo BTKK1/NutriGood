@@ -1,0 +1,26 @@
+You are an expert fullstack developer with 30 years of experience, specializing in Stripe integrations, React.js, Node.js, and Tailwind CSS, working on the "Saraat AI" calorie tracking web application in Replit. We need you to thoroughly analyze and fix the Stripe integration in the `TrialPage` component (`/frontend/src/components/TrialPage.jsx`) to resolve the error "Missing value for Stripe(): apiKey should be a string," ensure the 3-day free trial works correctly for the yearly plan (SAR 129.99/year) and monthly plan (SAR 39.99/mo), and implement a seamless payment flow, including Apple Pay support for iPhone users. The app name is "Saraat AI," and we’re using our custom logo (already inserted in the project). The page design matches the provided screenshot, showing a timeline, plan selection, "No Payment Due Now" checkbox, "Start My 3-Day Free Trial" button, and the error message below the button. Follow these steps with meticulous attention to detail, ensuring no line of code or configuration is missed, and provide a complete solution:
+
+1. **Analyze the Full Code Structure**
+   - Examine every line of the provided `TrialPage` component code, including imports, state management, functions, and JSX structure:
+     - Imports: `{ Button, Card }` from `"@/components/ui/button"` and `"@/components/ui/card"`, `{ ChevronLeft, Check }` from `"lucide-react"`, `{ useLocation }` from `"wouter"`, `{ useState }` from `"react"`, and `{ loadStripe }` from `"@stripe/stripe-js"`.
+     - State: `selectedPlan` (type `'yearly' | 'monthly'`, default `'yearly'`), `isLoading`, and `error`.
+     - Function: `handleSubscribe`, which uses `fetch` to call `/api/create-subscription`, initializes Stripe with `stripePromise`, and redirects to Stripe Checkout with `redirectToCheckout`.
+     - JSX: Layout with back arrow, title, timeline (for yearly plan), plan selection (monthly/yearly cards), checkbox, button, and error message.
+   - Identify any potential issues with syntax, environment variable usage, dependency versions, or logic flow that could cause the "Missing value for Stripe(): apiKey should be a string" error or prevent the payment flow from working.
+
+2. **Resolve the Stripe API Key Error**
+   - The error indicates that the Stripe API key (`apiKey`) is missing or not properly configured when initializing Stripe with `loadStripe`. Analyze:
+     - The line `const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)` to ensure `VITE_STRIPE_PUBLISHABLE_KEY` is correctly set.
+     - Check if `import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY` returns a valid string (e.g., `pk_test_...`) or `undefined`/`null`.
+   - Fix by:
+     - Verifying that `VITE_STRIPE_PUBLISHABLE_KEY` is defined in Replit’s Secrets or `.env` file as a string (e.g., `pk_test_123456789`).
+     - If using Vite, ensure the `.env` file is named `.env` (not `.env.local` or similar) and contains `VITE_STRIPE_PUBLISHABLE_KEY=pk_test_...`.
+     - Add a fallback or error check in `loadStripe`:
+       - If `import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY` is missing or not a string, log an error and throw an exception (e.g., `console.error('Stripe publishable key is missing or invalid'); throw new Error('Stripe initialization failed');`).
+     - Ensure the Replit project environment is configured to load Vite environment variables correctly (e.g., `VITE_` prefix for public variables).
+
+3. **Verify and Configure Stripe Price IDs**
+   - Analyze the code’s use of `import.meta.env[selectedPlan === 'yearly' ? 'VITE_STRIPE_YEARLY_PRICE_ID' : 'VITE_STRIPE_MONTHLY_PRICE_ID']` to retrieve price IDs.
+   - The error might occur if `VITE_STRIPE_YEARLY_PRICE_ID` or `VITE_STRIPE_MONTHLY_PRICE_ID` is missing or invalid in the environment.
+   - Fix by:
+     - Requesting the user to provide the Stripe price IDs for both plans:

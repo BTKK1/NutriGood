@@ -1,0 +1,183 @@
+Updated Approach: Handling Pre-Sign-In Form Data
+1. Temporarily Store Form Data Before Sign-In
+Since the user hasn’t signed in yet when they fill out the form, you can store the form data in a temporary location (e.g., browser localStorage or sessionStorage) until they complete the sign-in process. This is a common pattern for handling pre-authentication data.
+
+2. Save Form Data to Firebase After Sign-In
+Once the user signs in with Google, retrieve the temporary form data and save it to Firebase under the user’s UID. Then, use this data to calculate and update the dashboard metrics.
+
+3. Update the Dashboard in Real-Time
+After saving the data to Firebase, ensure the dashboard listens for changes to the user’s profile data and updates the metrics (calories, macros, etc.) accordingly.
+
+Revised Prompt for Replit
+Subject: Handling Pre-Sign-In Form Data and Updating Dashboard Metrics in Saraat AI App
+
+Description:
+I’m working on the Saraat AI app, a health tracking web app hosted on Replit that uses Firebase for authentication and data storage. The app has a user profile form where users input their age, height, current weight, and goal weight. These inputs should update the dashboard metrics (calories left, macros like protein, carbs, fat, etc.). However, there’s a complication: users fill out this form before they sign in with Google. Currently, the dashboard numbers (e.g., calories left: 2017, protein: 118g, carbs: 260g, fat: 56g) are static and don’t reflect the form inputs, even though the BMI updates correctly on the profile page.
+
+Here’s the issue in detail:
+
+The form is filled out before the user signs in (e.g., age: 24, height: 6’11”, weight: 118 lbs, goal weight: 118 lbs).
+After filling out the form, the user signs in with Google (Firebase Authentication is already implemented).
+The dashboard should update its metrics (calories, macros) based on the form inputs, but currently, it doesn’t.
+The BMI calculation (11.0, underweight) updates correctly, so the form data is being processed, but the dashboard metrics aren’t reflecting the changes.
+Requirements to Fix:
+
+Temporarily Store Form Data Before Sign-In:
+When the user submits the form, store the data (age, height, weight, goal weight) in localStorage or sessionStorage since they haven’t signed in yet.
+Example:
+javascript
+
+Collapse
+
+Wrap
+
+Copy
+function saveFormDataToLocalStorage(age, heightInches, weightLbs, goalWeightLbs) {
+  const formData = {
+    age: parseInt(age),
+    heightInches: parseFloat(heightInches),
+    weightLbs: parseFloat(weightLbs),
+    goalWeightLbs: parseFloat(goalWeightLbs),
+    updatedAt: new Date().toISOString()
+  };
+  localStorage.setItem('pendingUserProfile', JSON.stringify(formData));
+  console.log('Form data saved to localStorage:', formData);
+}
+Call this function when the form is submitted, then redirect the user to the Google Sign-In flow.
+Save Form Data to Firebase After Sign-In:
+After the user signs in with Google, retrieve the form data from localStorage and save it to Firebase under the user’s UID.
+Example:
+javascript
+
+Collapse
+
+Wrap
+
+Copy
+import { db, auth } from './firebase-config.js';
+import { doc, setDoc } from 'firebase/firestore';
+
+auth.onAuthStateChanged(async (user) => {
+  if (user) {
+    // Check for pending form data in localStorage
+    const pendingData = localStorage.getItem('pendingUserProfile');
+    if (pendingData) {
+      const formData = JSON.parse(pendingData);
+      const userRef = doc(db, 'users', user.uid);
+      await setDoc(userRef, formData, { merge: true });
+      console.log('Form data saved to Firebase:', formData);
+      // Clear the localStorage after saving
+      localStorage.removeItem('pendingUserProfile');
+    }
+    updateDashboard(); // Call function to update dashboard
+  }
+});
+Calculate Metrics Based on Form Data:
+Use the form data to calculate the user’s Basal Metabolic Rate (BMR), Total Daily Energy Expenditure (TDEE), and macros:
+BMR (Mifflin-St Jeor Equation):
+For men: BMR = 10 × weight (kg) + 6.25 × height (cm) − 5 × age (years) + 5
+For women: BMR = 10 × weight (kg) + 6.25 × height (cm) − 5 × age (years) − 161
+Convert height (6’11” = 83 inches = 210.82 cm) and weight (118 lbs = 53.52 kg).
+Example (assuming male): BMR = 10 × 53.52 + 6.25 × 210.82 − 5 × 24 + 5 = 1737.825 kcal/day.
+TDEE: Adjust BMR for activity level (e.g., sedentary = BMR × 1.2).
+Calories: Adjust TDEE based on goal weight (e.g., deficit for weight loss, surplus for weight gain).
+Macros: Use a split (e.g., 40% carbs, 30% protein, 30% fat):
+Carbs (g) = (calories × 0.4) / 4
+Protein (g) = (calories × 0.3) / 4
+Fat (g) = (calories × 0.3) / 9
+Example:
+javascript
+
+Collapse
+
+Wrap
+
+Copy
+function calculateMetrics(userData) {
+  const { age, heightInches, weightLbs, goalWeightLbs } = userData;
+  const heightCm = heightInches * 2.54;
+  const weightKg = weightLbs * 0.453592;
+  const bmr = 10 * weightKg + 6.25 * heightCm - 5 * age + 5; // Assuming male
+  const tdee = bmr * 1.2; // Sedentary activity level
+  let calories = tdee;
+  if (goalWeightLbs < weightLbs) calories -= 500; // Deficit for weight loss
+  else if (goalWeightLbs > weightLbs) calories += 500; // Surplus for weight gain
+
+  const carbs = (calories * 0.4) / 4;
+  const protein = (calories * 0.3) / 4;
+  const fat = (calories * 0.3) / 9;
+
+  return { calories, carbs, protein, fat };
+}
+Update Dashboard in Real-Time:
+Use a Firebase real-time listener to update the dashboard whenever the user’s profile data changes.
+Example:
+javascript
+
+Collapse
+
+Wrap
+
+Copy
+import { db, auth } from './firebase-config.js';
+import { doc, onSnapshot } from 'firebase/firestore';
+
+function updateDashboard() {
+  const user = auth.currentUser;
+  if (user) {
+    const userRef = doc(db, 'users', user.uid);
+    onSnapshot(userRef, (doc) => {
+      if (doc.exists()) {
+        const userData = doc.data();
+        console.log('User data:', userData);
+        const metrics = calculateMetrics(userData);
+        console.log('Calculated metrics:', metrics);
+
+        document.getElementById('calories-left').innerText = Math.round(metrics.calories);
+        document.getElementById('protein-left').innerText = `${Math.round(metrics.protein)}g`;
+        document.getElementById('carbs-left').innerText = `${Math.round(metrics.carbs)}g`;
+        document.getElementById('fat-left').innerText = `${Math.round(metrics.fat)}g`;
+      }
+    });
+  }
+}
+
+auth.onAuthStateChanged((user) => {
+  if (user) updateDashboard();
+});
+Handle Form Submission and Redirect to Sign-In:
+When the user submits the form, save the data to localStorage and redirect them to the sign-in page.
+Example (in profile.js or form handler):
+javascript
+
+Collapse
+
+Wrap
+
+Copy
+document.getElementById('profile-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const age = document.getElementById('age').value;
+  const heightInches = document.getElementById('height').value;
+  const weightLbs = document.getElementById('weight').value;
+  const goalWeightLbs = document.getElementById('goal-weight').value;
+
+  saveFormDataToLocalStorage(age, heightInches, weightLbs, goalWeightLbs);
+  // Redirect to sign-in page
+  window.location.href = '/signin.html';
+});
+Debugging:
+Add console logs to verify that the form data is saved to localStorage after form submission.
+Log the retrieved form data from localStorage after sign-in to ensure it’s being read correctly.
+Log the data saved to Firebase to confirm it’s stored under the user’s UID.
+Log the calculated metrics to ensure the BMR, TDEE, and macros are correct.
+Expected Outcome:
+
+When the user fills out the form (e.g., age: 24, height: 6’11”, weight: 118 lbs, goal weight: 118 lbs), the data is saved to localStorage.
+After signing in with Google, the form data is retrieved from localStorage, saved to Firebase, and used to calculate the dashboard metrics.
+The dashboard updates to show new values for calories left, protein, carbs, and fat based on the user’s inputs (e.g., a 24-year-old, 6’11”, 118 lbs user might have a TDEE of ~2085 kcal/day, adjusted to ~2085 if maintaining weight, with macros like 208g carbs, 156g protein, 69g fat).
+Additional Info:
+
+The app uses Firebase Authentication with Google Sign-In.
+The app is hosted on Replit as a web app but will eventually transition to iOS.
+The form submission works for BMI calculation, but the dashboard metrics need to reflect the form data.

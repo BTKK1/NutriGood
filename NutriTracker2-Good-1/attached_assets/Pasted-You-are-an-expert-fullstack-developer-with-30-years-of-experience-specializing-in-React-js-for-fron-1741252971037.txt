@@ -1,0 +1,48 @@
+You are an expert fullstack developer with 30 years of experience, specializing in React.js for frontend development, Tailwind CSS for styling, and Firebase (Authentication, Firestore, Realtime Database, Cloud Functions) for backend development. You are working on the "Saraat AI" calorie tracking web application in Replit. The user has provided two screenshots of the "Log Exercise" page: the current implementation (first image) and the reference design (second image). The task is to adjust the current "Log Exercise" page in `/frontend/src/components/ExerciseLogPage.jsx` to match the reference design exactly in terms of positioning, size, title, subtitle, and overall layout, ignoring the iPhone status bar icons above. The reference design features a back arrow ("<") and "Log Exercise" title, followed by three white rounded cards with consistent spacing and alignment for "Run," "Weight lifting," and "Describe" options. Ensure pixel-perfect replication of the reference layout, maintaining functionality. Follow these steps:
+
+#### Frontend Implementation
+- **Analysis**:
+  - **Current Implementation (First Image)**:
+    - Header: "Exercise" and "Log Exercise" titles stacked vertically, back arrow on the left, time (4:50) and status icons on the right.
+    - Body: Three white rounded cards (~full-width, ~80px height) with icons and text, stacked vertically with equal spacing (~10px gaps).
+    - Background: Light gray.
+  - **Reference Design (Second Image)**:
+    - Header: Back arrow ("<") and "Log Exercise" title on the same line, horizontally aligned, with no additional "Exercise" title or time/status icons.
+    - Body: Three white rounded cards (~full-width, ~60px height) with icons and text ("Run," "Weight lifting," "Describe"), stacked vertically with slightly larger gaps (~15px) between cards.
+    - Background: White.
+    - Positioning: Cards centered with consistent padding and margins, back arrow ~40px from the left edge.
+  - Focus on matching the reference’s horizontal header alignment, reduced card height, increased vertical spacing, and white background.
+- **Structure Update**:
+  - Update `/frontend/src/components/ExerciseLogPage.jsx` to align with the reference design.
+- **Functionality**:
+  - Maintain navigation: Back arrow returns to the previous page, "Run" navigates to `/exercise-type/run`, "Weight lifting" to `/exercise-type/weight-lifting`, "Describe" to `/describe-exercise`.
+- **Implementation Steps**:
+  1. Open `/frontend/src/components/ExerciseLogPage.jsx`.
+  2. Update the header:
+     - Replace the stacked titles with a single line: `<div className="w-full flex justify-between items-center p-4"><button className="bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center"><</button><h1 className="text-2xl">Log Exercise</h1></div>`.
+     - Remove time and status icons, aligning the back arrow ~40px from the left (use `ml-10` or adjust with dev tools).
+  3. Update the body:
+     - Change background to white: `bg-white min-h-screen`.
+     - Adjust card styling: `<div className="w-11/12 mx-auto bg-white rounded-lg p-3 mb-6 flex items-center h-16">` (height ~60px, margin-bottom ~24px to approximate 15px gap).
+     - Use icons from `@heroicons/react` (e.g., `RunIcon`, `DumbbellIcon`, `PencilIcon`) with `w-6 h-6 mr-2`.
+     - Text: "Run\nRunning, jogging, sprinting, etc." (use `<br />` for line break), same for "Weight lifting" and "Describe".
+  4. Ensure consistent padding (e.g., `p-4` on the container) and centered alignment with `mx-auto`.
+  5. Use browser dev tools to fine-tune spacing and heights to match the reference pixel-perfectly.
+- **Testing**:
+  - Verify the header shows only "Log Exercise" with the back arrow on the left, no additional titles or icons.
+  - Confirm three cards are ~60px high with ~15px gaps, full-width (~90% of screen), centered on a white background.
+  - Test navigation functionality for each card and the back arrow.
+  - Check responsiveness on mobile and desktop, ensuring no overlap or misalignment.
+
+#### Backend Implementation
+- **Analysis**:
+  - No backend changes are required as this update is purely visual.
+- **Testing**:
+  - Ensure existing navigation routes still function.
+
+#### Additional Instructions
+- Add comments in `ExerciseLogPage.jsx` (e.g., "// Matched reference design with horizontal header and 60px card height").
+- Log a `console.log` (e.g., `console.log('Log Exercise page aligned with reference');`).
+- Use exact measurements from the reference (e.g., 60px card height, 15px gaps) to ensure precision.
+
+This prompt adjusts the "Log Exercise" page to mirror the reference design’s positioning, size, and layout exactly, focusing solely on the page content.

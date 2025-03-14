@@ -1,0 +1,256 @@
+Let’s create a detailed prompt for Replit to build a functional fitness and nutrition tracking app with both frontend and backend. The app will include an onboarding flow, a home page with dynamic calorie and macro tracking, exercise logging, analytics with goal progress, and automatic updates based on user inputs. I’ll break this down into a plan and then provide a comprehensive prompt for Replit.
+
+Plan for the App
+1. Onboarding Flow
+Purpose: Collect user data to create a personalized plan.
+Steps:
+Gender: Male/Female (affects calorie calculations).
+Workouts Per Week:
+0-2 (Sedentary),
+3-5 (Moderate),
+6+ (Active).
+This determines the activity multiplier for calorie needs.
+Height & Weight: Used to calculate BMI and base calorie needs.
+Goal: Lose weight, Maintain, Gain weight (adjusts calorie targets).
+Backend:
+Store user data in a database (e.g., MongoDB or SQLite).
+Calculate a personalized plan using the Harris-Benedict Equation for Basal Metabolic Rate (BMR), adjusted by activity level and goal.
+Save the plan (calorie, protein, carbs, fat targets) to the user’s profile.
+2. Home Page
+Display:
+Calories/Protein/Fat/Carbs Left: Starts with the user’s daily targets and subtracts based on food logged (via scanning or manual entry).
+Calories Burned: Starts at 0, updates based on exercises logged (e.g., running, weight lifting).
+Recently Logged: Shows a list of recently added foods and exercises.
+Backend:
+Fetch user’s daily targets from the database.
+Track food and exercise logs, updating macros and calories in real-time.
+Store logs with timestamps for the "Recently Logged" section.
+3. Exercise Logging
+Options:
+Predefined categories: Run (e.g., running, jogging), Weight Lifting (e.g., machines, free weights), Describe (manual text input).
+Example calorie burns: Running (10 cal/min), Weight Lifting (6 cal/min). Duration-based.
+Backend:
+Save exercise logs with type, duration, and calories burned.
+Update the "Calories Burned" total on the home page.
+Update the icon in "Calories Burned" to reflect the type of exercise (e.g., running icon for "Run").
+4. Food Logging
+Options:
+Scan Food (simulated for now, assumes a calorie/macro input).
+Food Database (search for food items with predefined macros).
+Backend:
+Save food logs with calories, protein, carbs, and fat.
+Subtract from the user’s daily targets for "Calories/Protein/Fat/Carbs Left."
+5. Analytics Page
+Display:
+Goal Progress: Show a progress bar/graph based on weight updates (e.g., starting weight to goal weight).
+BMI: Calculate and display BMI with a visual range (Underweight, Healthy, Overweight, Obese).
+Nutrition Data: Show a weekly graph of calories/macros consumed (if no data, show "No data to show").
+Backend:
+Calculate BMI: weight (kg) / (height (m))^2.
+Track weight updates over time to plot progress.
+Aggregate food logs to display nutrition data over time (weekly view).
+6. Automatic Updates
+Weight Updates:
+Users can update their weight, which recalculates BMI and adjusts their plan (calories/macros).
+Backend:
+Recalculate BMR and daily targets when weight changes.
+Update BMI and store weight history for progress tracking.
+7. Database Structure
+Users:
+id, gender, workoutsPerWeek, height, weight, goal, calorieTarget, proteinTarget, carbTarget, fatTarget, weightHistory (array of {date, weight}).
+Food Logs:
+userId, date, foodName, calories, protein, carbs, fat.
+Exercise Logs:
+userId, date, type, duration, caloriesBurned.
+8. Tech Stack
+Frontend: React (with Tailwind CSS for styling, Lucide React for icons).
+Backend: Node.js with Express.
+Database: MongoDB (or SQLite for simplicity on Replit).
+Routing: React Router for navigation.
+Detailed Prompt for Replit
+text
+
+Collapse
+
+Wrap
+
+Copy
+I need a fully functional fitness and nutrition tracking app with both frontend and backend, built on Replit. The app should have an onboarding flow, a home page with dynamic tracking, exercise and food logging, and an analytics page. Below are the detailed requirements:
+
+---
+
+### App Overview
+- **Purpose**: A fitness and nutrition tracking app called "Saraat AI" that helps users track calories, macros, exercises, and progress toward their goals.
+- **Tech Stack**:
+  - **Frontend**: React with Tailwind CSS (for styling) and Lucide React (for icons).
+  - **Backend**: Node.js with Express.
+  - **Database**: MongoDB (or SQLite if MongoDB isn’t easily available on Replit).
+  - **Routing**: Use React Router for navigation between pages.
+
+---
+
+### Features and Requirements
+
+#### 1. Onboarding Flow
+- **Purpose**: Collect user data to create a personalized plan.
+- **Pages**:
+  1. **Gender Selection**:
+     - Question: "Choose your Gender" with options "Male" and "Female".
+     - Buttons: Male, Female, and a "Next" button to proceed.
+  2. **Workouts Per Week**:
+     - Question: "How many workouts do you do per week?".
+     - Options:
+       - "0-2 (Workouts now and then)" with a 🌱 icon.
+       - "3-5 (A few workouts per week)" with a 💪 icon.
+       - "6+ (Dedicated athlete)" with a 🏃 icon.
+     - Buttons: Select one option, then "Next".
+  3. **Height & Weight**:
+     - Inputs: Height (in cm), Weight (in kg).
+     - Button: "Next".
+  4. **Goal**:
+     - Question: "What is your goal?".
+     - Options: "Lose weight", "Maintain", "Gain weight".
+     - Button: "Finish" (saves data and redirects to Home).
+- **Backend**:
+  - Store user data: `gender`, `workoutsPerWeek`, `height`, `weight`, `goal`.
+  - Calculate a personalized plan:
+    - **BMR (Basal Metabolic Rate)**:
+      - Male: `BMR = 10 * weight (kg) + 6.25 * height (cm) - 5 * age + 5` (assume age 30 for simplicity).
+      - Female: `BMR = 10 * weight (kg) + 6.25 * height (cm) - 5 * age - 161`.
+    - **Activity Multiplier**:
+      - 0-2 workouts: 1.2 (sedentary).
+      - 3-5 workouts: 1.55 (moderate).
+      - 6+ workouts: 1.9 (active).
+    - **Total Daily Energy Expenditure (TDEE)**: `TDEE = BMR * Activity Multiplier`.
+    - **Calorie Target**:
+      - Lose weight: TDEE - 500.
+      - Maintain: TDEE.
+      - Gain weight: TDEE + 500.
+    - **Macros**:
+      - Protein: 1.6g per kg of body weight.
+      - Fat: 30% of calorie target (1g fat = 9 calories).
+      - Carbs: Remaining calories (1g carbs = 4 calories).
+  - Save the plan: `calorieTarget`, `proteinTarget`, `carbTarget`, `fatTarget`.
+
+#### 2. Home Page
+- **Display**:
+  - **Header**: Logo (use a placeholder image or SVG), "Saraat AI", and a streak counter (e.g., "🔥 0").
+  - **Calendar Strip**: Show days of the week (S, M, T, W, T, F, S) with dates (e.g., 2-8). Highlight today (e.g., Wednesday 5th).
+  - **Scrollable Sections**:
+    - **Section 1**:
+      - **Calories Left**: Show remaining calories (e.g., "2017 🔥 Calories left") with a progress circle (e.g., "-1%"). Include "Burns in: 2h 30m" with a clock icon.
+      - **Macros**:
+        - Protein Left (e.g., "118g, 2%"), Carbs Left (e.g., "260g, 13%"), Fat Left (e.g., "56g, 20%").
+        - Each macro has a progress circle and an icon (Beef for protein, Wheat for carbs, Utensils for fat).
+        - Add buttons: "Log exercise" (links to /exercise), "Saved foods" (placeholder), "Food database" (placeholder), "Scan food" (links to /food/scan).
+    - **Section 2**:
+      - **Steps Today**: "0" with "Connect Apple Health to track your steps" and a heart icon (placeholder functionality).
+      - **Calories Burned**: Start at "0". Update based on exercises logged (e.g., "278"). Show breakdown (e.g., "Steps +0", "Boxing +278") with icons (Footprints, Dumbbell).
+      - **Water Tracking**: "0 fl oz (0.0 cups)" with + and - buttons to adjust (8 fl oz increments). Include a settings icon (placeholder).
+  - **Trial Notice**: "80% off Your trial ends tomorrow!!" with a timer "24:08:02" and a "Resubscribe now" button (placeholder).
+  - **Recently Logged**:
+    - Show a list of recent food and exercise logs (e.g., "No recent activity" if empty).
+    - Buttons: "Log Exercise" (links to /exercise), "Log Food" (links to /food/scan).
+- **Backend**:
+  - Fetch user’s daily targets (`calorieTarget`, `proteinTarget`, `carbTarget`, `fatTarget`).
+  - Track food logs: Subtract calories/macros from targets.
+  - Track exercise logs: Add to "Calories Burned" and update icons based on exercise type.
+  - Fetch recent logs (last 5 food/exercise entries) for "Recently Logged".
+
+#### 3. Exercise Logging (/exercise)
+- **Display**:
+  - Header: Back arrow, "Log Exercise".
+  - Options (as buttons):
+    - "Run (Running, jogging, sprinting, etc.)" with a running icon.
+    - "Weight lifting (Machines, free weights, etc.)" with a dumbbell icon.
+    - "Describe (Write your workout in text)" with a pencil icon.
+  - On click (e.g., "Run"):
+    - Show a form: Duration (in minutes), Intensity (Low/Medium/High).
+    - Example calorie burns:
+      - Run: 10 cal/min (Low), 12 cal/min (Medium), 15 cal/min (High).
+      - Weight Lifting: 6 cal/min (Low), 8 cal/min (Medium), 10 cal/min (High).
+      - Describe: Assume 8 cal/min (Medium intensity).
+    - Button: "Log" (saves and redirects to Home).
+- **Backend**:
+  - Save exercise: `type` (e.g., "Run"), `duration`, `intensity`, `caloriesBurned`.
+  - Update "Calories Burned" on Home page.
+  - Update icon in "Calories Burned" (e.g., Footprints for Run, Dumbbell for Weight Lifting).
+
+#### 4. Food Logging (/food/scan)
+- **Display**:
+  - For now, simulate scanning with a form:
+    - Inputs: Food Name, Calories, Protein (g), Carbs (g), Fat (g).
+    - Button: "Log Food".
+- **Backend**:
+  - Save food log: `foodName`, `calories`, `protein`, `carbs`, `fat`.
+  - Subtract from daily targets on Home page.
+  - Add to "Recently Logged".
+
+#### 5. Analytics Page (/analytics)
+- **Display**:
+  - **Goal Progress**:
+    - Show "Goal Weight: X lbs" and "Current Weight: Y lbs".
+    - Progress bar: Percentage from starting weight to goal weight.
+    - Tabs: "90 Days", "6 Months", "1 Year", "All Time" (placeholder for now, show 90 Days).
+  - **BMI**:
+    - Calculate: `weight (kg) / (height (m))^2`.
+    - Show: "Your BMI is X" with a color-coded bar (Underweight <18.5, Healthy 18.5-24.9, Overweight 25-29.9, Obese 30+).
+  - **Nutrition**:
+    - Tabs: "This week", "Last week", "2 wks. ago", "3 wks. ago".
+    - If no data: "No data to show. This will update as you log more food."
+    - Otherwise, show a bar chart of calories/macros per day (use a library like Chart.js).
+- **Backend**:
+  - Fetch user’s weight history for progress.
+  - Calculate BMI.
+  - Aggregate food logs for nutrition data (weekly calories/macros).
+
+#### 6. Weight Updates
+- **Display**:
+  - On Analytics page, add an "Update Weight" button.
+  - Modal: Input new weight (kg), "Save".
+- **Backend**:
+  - Update user’s weight.
+  - Recalculate BMR, TDEE, and daily targets.
+  - Recalculate BMI.
+  - Add to `weightHistory`.
+
+#### 7. Database
+- **Users**:
+  - `id`, `gender` (string), `workoutsPerWeek` (number), `height` (number, cm), `weight` (number, kg), `goal` (string), `calorieTarget` (number), `proteinTarget` (number), `carbTarget` (number), `fatTarget` (number), `weightHistory` (array of `{date, weight}`).
+- **Food Logs**:
+  - `id`, `userId`, `date` (timestamp), `foodName` (string), `calories` (number), `protein` (number), `carbs` (number), `fat` (number).
+- **Exercise Logs**:
+  - `id`, `userId`, `date` (timestamp), `type` (string), `duration` (number, minutes), `intensity` (string), `caloriesBurned` (number).
+
+#### 8. Navigation
+- **Routes**:
+  - `/`: Onboarding (if not completed) or Home (if completed).
+  - `/exercise`: Exercise logging.
+  - `/food/scan`: Food logging.
+  - `/analytics`: Analytics page.
+- **Bottom Navigation**:
+  - Icons: Home, Analytics, Settings (placeholder), + (links to /exercise or /food/scan based on context).
+
+---
+
+### Additional Notes
+- Use Tailwind CSS for styling to match the screenshots provided.
+- Use Lucide React for icons (e.g., Footprints, Dumbbell, Beef, Wheat, Utensils).
+- Ensure all buttons are functional (e.g., logging food/exercise updates the Home page in real-time).
+- Add placeholder functionality for "Food Database", "Saved Foods", and "Settings" (just display an alert for now).
+- Use Chart.js for the nutrition graph in Analytics.
+- Simulate Apple Health connection (just a placeholder button).
+
+---
+
+### Deliverables
+1. A complete Replit project with:
+   - Frontend (React with Tailwind CSS and Lucide React).
+   - Backend (Node.js with Express).
+   - Database (MongoDB or SQLite).
+2. All routes and components as described.
+3. Functional onboarding, home, exercise logging, food logging, and analytics pages.
+4. Real-time updates for calories/macros, calories burned, and recently logged items.
+5. A README with instructions to run the app.
+
+Please provide the full code structure, including file organization, and ensure everything

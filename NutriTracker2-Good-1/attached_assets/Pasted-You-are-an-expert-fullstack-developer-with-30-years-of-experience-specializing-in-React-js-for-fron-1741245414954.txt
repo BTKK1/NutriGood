@@ -1,0 +1,81 @@
+You are an expert fullstack developer with 30 years of experience, specializing in React.js for frontend development, Tailwind CSS for styling, and Firebase (Authentication, Firestore, Realtime Database, Cloud Functions) for backend development. You are working on the "Saraat AI" calorie tracking web application in Replit. The user has provided three screenshots of the Exercise logging feature: the "Log Exercise" main page, the "Weight lifting" intensity and duration page, and the "Describe Exercise" page. The task is to clone these pages exactly as shown, replicating every detail, icon, button, text, and layout pixel-perfectly, without missing or altering any element. The pages should integrate seamlessly with the existing navigation and Firebase backend, maintaining full functionality. Follow these steps:
+
+#### Frontend Implementation
+- **Analysis**:
+  - **Log Exercise Page**:
+    - Header: "Exercise" title, "Log Exercise" subtitle, back arrow ("<") button on the left, time (4:50) and status icons (Wi-Fi, battery) on the right.
+    - Body: Three white rounded cards (each ~full-width, ~80px height) with icons and text:
+      - "Run" with a running shoe icon and "Running, jogging, sprinting, etc." description.
+      - "Weight lifting" with a dumbbell icon and "Machines, free weights, etc." description.
+      - "Describe" with a pencil icon and "Write your workout in text" description.
+    - Background: Light gray with no additional elements.
+  - **Weight Lifting Page**:
+    - Header: "Weight lifting" title with a dumbbell icon, back arrow ("<") button, time (4:51) and status icons.
+    - Body:
+      - "Set intensity" section with a sun icon, three radio options ("High," "Medium," "Low") with descriptions, and a selected "Medium" option.
+      - "Duration" section with a clock icon, four buttons (15 mins, 30 mins, 60 mins, 90 mins) and a custom input field (default "15").
+    - Footer: Black "Add" button (~full-width, ~50px height).
+  - **Describe Exercise Page**:
+    - Header: "Describe Exercise" title, back arrow ("<") button, time (4:51) and status icons, ellipsis ("...") on the right.
+    - Body:
+      - Text input field with "HIIT" entered.
+      - "Created by AI" tag below the input.
+      - Example text: "Stair climbing for 25 mins, thighs burning" in a light gray box.
+    - Footer: Black "Edit Exercise" button (~full-width, ~50px height).
+    - Keyboard visible with "HIT" suggestions.
+  - Ensure all icons, fonts, colors (black text, white cards, light gray background), and spacing match the screenshots exactly.
+- **Structure Update**:
+  - Create or update the following components in `/frontend/src/components/`:
+    - `ExerciseLogPage.jsx` for the main "Log Exercise" page.
+    - `ExerciseTypePage.jsx` for "Run" and "Weight lifting" subpages.
+    - `DescribeExercisePage.jsx` for the "Describe" page.
+  - Update `/frontend/src/App.jsx` with React Router routes:
+    - `/log-exercise` to `ExerciseLogPage`.
+    - `/exercise-type/:type` to `ExerciseTypePage` (e.g., `/exercise-type/weight-lifting`).
+    - `/describe-exercise` to `DescribeExercisePage`.
+- **Functionality**:
+  - **Log Exercise Page**: Clicking "Run" navigates to `/exercise-type/run`, "Weight lifting" to `/exercise-type/weight-lifting`, "Describe" to `/describe-exercise`.
+  - **Weight Lifting Page**: Radio buttons toggle intensity, duration buttons set predefined times, custom input allows manual entry, "Add" button saves to Firebase.
+  - **Describe Exercise Page**: Text input accepts user entry, "Created by AI" tag appears, "Edit Exercise" button saves or edits the entry in Firebase.
+- **Implementation Steps**:
+  1. Install `@heroicons/react`: `npm install @heroicons/react` if not installed.
+  2. Create `ExerciseLogPage.jsx`:
+     - Use `flex flex-col items-center p-4 bg-gray-100 min-h-screen`.
+     - Header: `<div className="w-full flex justify-between items-center mb-4"><button className="bg-gray-200 rounded-full w-8 h-8">&lt;</button><h1 className="text-2xl">Exercise</h1><h2 className="text-3xl">Log Exercise</h2><span>4:50</span></div>`.
+     - Three cards: `<div className="w-full bg-white rounded-lg p-4 mb-4 flex items-center"><RunIcon className="w-6 h-6 mr-2" />Run<br />Running, jogging, sprinting, etc.</div>` (repeat for "Weight lifting" with DumbbellIcon, "Describe" with PencilIcon).
+  3. Create `ExerciseTypePage.jsx`:
+     - Header: Similar to above with dynamic title (e.g., "Weight lifting").
+     - Intensity section: `<div className="bg-white rounded-lg p-4 mb-4"><SunIcon className="w-6 h-6" />Set intensity<div><input type="radio" name="intensity" />High...</div><div><input type="radio" name="intensity" checked />Medium...</div><div><input type="radio" name="intensity" />Low...</div></div>`.
+     - Duration section: `<div className="bg-white rounded-lg p-4 mb-4"><ClockIcon className="w-6 h-6" />Duration<button className="bg-black text-white rounded-full px-4 py-2 mx-1">15 mins</button>...<input className="w-full p-2 border" value="15" /></div>`.
+     - Footer: `<button className="w-full bg-black text-white rounded-lg p-3">Add</button>`.
+  4. Create `DescribeExercisePage.jsx`:
+     - Header: Similar to above with ellipsis.
+     - Body: `<input className="w-full p-2 border mb-2" value="HIIT" /><div className="bg-gray-100 p-2 rounded-lg">Created by AI<br />Example: Stair climbing for 25 mins, thighs burning</div>`.
+     - Footer: `<button className="w-full bg-black text-white rounded-lg p-3">Edit Exercise</button>`.
+  5. Use `useState` for intensity and duration, `useNavigate` for navigation, and Firebase `setDoc` to save exercise data.
+  6. Match fonts (e.g., system default), colors (black `#000000`, white `#FFFFFF`, light gray `#F3F4F6`), and spacing (10px padding, 4px margins) exactly.
+- **Testing**:
+  - Verify every icon, text, button, and layout matches the screenshots pixel-perfectly using browser dev tools.
+  - Test navigation between pages (back arrow, option clicks).
+  - Ensure radio buttons, duration buttons, and input fields function as shown.
+  - Confirm Firebase saves exercise data correctly (e.g., type, intensity, duration, description).
+
+#### Backend Implementation
+- **Analysis**:
+  - Extend Firestore collection `users/{userId}/exercises` to store exercise logs.
+- **Structure Update**:
+  - Add fields: `type` (e.g., "weight-lifting"), `intensity` (e.g., "medium"), `duration` (e.g., 15), `description` (e.g., "HIIT").
+- **Functionality**:
+  - Save exercise data when "Add" or "Edit Exercise" is clicked.
+- **Implementation Steps**:
+  1. Update `/backend/firebase.js` to include the `exercises` collection.
+  2. Create a Cloud Function in `/backend/functions/index.js`: `exports.saveExercise = functions.https.onCall((data, context) => {...});` to handle exercise data.
+- **Testing**:
+  - Verify exercise data is stored and retrieved from Firestore.
+
+#### Additional Instructions
+- Add comments (e.g., "// Exact replica of Log Exercise page with all icons and text").
+- Log `console.log` (e.g., `console.log('Exercise page cloned');`) in each component.
+- Use exact measurements and styles from screenshots to avoid any deviation.
+
+This prompt ensures the Exercise logging pages are cloned with absolute precision, awaiting further images for additional details.

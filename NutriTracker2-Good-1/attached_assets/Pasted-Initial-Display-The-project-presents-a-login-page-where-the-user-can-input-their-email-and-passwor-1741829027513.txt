@@ -1,0 +1,27 @@
+Initial Display: The project presents a login page, where the user can input their email and password, or alternatively, log in using Apple or Google accounts.
+
+Redirect Loop: When you try to log in using the auth option, it appears that the page attempts to redirect to an onboarding directory. However, it fails to fully load that page.
+
+Page Refreshing: The page appears to be refreshing and looping, causing it to alternate between the onboarding URL and the initial login page without successfully redirecting.
+
+Possible Causes in 300 Words
+
+Incorrect Redirection Logic: The primary cause is likely an error in the server-side or client-side code that handles the redirect process after authentication. There might be an incorrect URL being used in the redirection, or the redirect might be initiated without successful authentication.
+
+Dependency Issues: There may be a library or dependency in the code that is required for redirection that is not properly included or configured in the project's setup. This could cause the redirection to fail.
+
+Authentication Issues: It is also possible that the authentication system is returning an incorrect value, triggering a loop. This is very likely if an error during authentication triggers a redirect back to the log-in page.
+
+Configuration Errors: There might be an issue with how your webserver or routing is configured. Incorrectly configured server parameters can cause endless redirect loops because it is causing the wrong page to render at the redirect location.
+
+Cookie or Session Errors: Session cookies may not be set or stored correctly, causing the application to be in an endless redirect loop, not detecting the login and continuing the user back to the login page.
+
+Steps to Troubleshoot
+
+Code Review: Inspect the code related to authentication, especially redirection logic, for errors in how URLs are constructed or how authentication is processed. Check for infinite redirect loops in the source code.
+
+Server Logs: Check server logs to identify whether the app is experiencing any errors when trying to redirect the user. Check server settings for a root cause of the redirect issue.
+
+Network Activity: Use the browser's developer tools to inspect the network tab, identify the redirects and examine the response headers for any unexpected behavior or error codes.
+
+Simplify the Flow: Reduce or remove the complexity of the redirect logic, and test each of the routes separately to rule out any issues.

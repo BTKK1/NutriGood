@@ -1,0 +1,32 @@
+Design a UI layout that mirrors the style and structure of the second reference image. Follow these detailed instructions:
+
+1. Button Design:
+Create four buttons within a pop-up modal, each in its own equally sized box.
+Buttons should have the same size and position as the second reference image, ensuring perfect alignment.
+The button labels are:
+'Log Exercise' with a dumbbell icon
+'Saved Foods' with a bookmark icon
+'Food Database' with a magnifying glass icon
+'Scan Food' with a camera icon
+2. Button Styling:
+Use a white rounded box with soft shadows for each button.
+Icons should be centered within the buttons, using the same size and style as in the reference.
+Ensure the icons and text are balanced, with a minimal and professional look.
+Apply a subtle hover effect (e.g., a light shadow or slight scale effect) to indicate interactivity.
+3. Modal Box Layout:
+The modal box should be separated into 4 equal-sized boxes, with 2 boxes per row.
+Maintain small padding between the boxes for a clean grid layout.
+The modal should not overshadow the background but be distinct enough for focus.
+4. Plus Button Design:
+The plus button should match the size, position, and styling of the reference image.
+Position it at the bottom center of the screen, with a consistent shadow and border radius.
+The plus icon should be centered and clearly visible.
+5. General Design Elements:
+Use consistent colors, fonts, and icon styles throughout the UI.
+Make sure all elements are perfectly aligned and maintain the same proportions as the reference.
+The background should remain minimalistic, focusing attention on the modal and buttons.
+6. Functional Requirements:
+Ensure all buttons are fully interactive and trigger the intended actions.
+The plus button should open the modal with the 4 feature buttons as described.
+Provide smooth transitions and animations where applicable.
+Replicate the exact layout, including spacing, sizing, and design elements, to achieve a 10/10 match with the reference UI. Test all elements for consistency and usability before finalizing the design.

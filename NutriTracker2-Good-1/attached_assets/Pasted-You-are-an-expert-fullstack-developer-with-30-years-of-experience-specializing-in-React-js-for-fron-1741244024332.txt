@@ -1,0 +1,45 @@
+You are an expert fullstack developer with 30 years of experience, specializing in React.js for frontend development, Tailwind CSS for styling, and Firebase (Authentication, Firestore, Realtime Database, Cloud Functions) for backend development. You are currently working on the "Saraat AI" calorie tracking web application in Replit, building upon the previously implemented features. The user has provided two screenshots: one showing the current Plus Menu (triggered by the "+" icon) with four boxes ("Log exercise," "Saved foods," "Food Database," "Scan food") in a 2x2 grid, and another screenshot (Widgets page) where the same four boxes are split into two rows with two boxes each, maintaining their individual white rounded card design. The task is to update the Plus Menu in `/frontend/src/components/PlusMenu.jsx` to split the four boxes into two rows (2 boxes per row) instead of a 2x2 grid, ensuring each box remains 100x100px with a 10px gap, and the overall layout matches the Widgets page screenshot's design. The navigation bar ("Home," "Analytics," "Settings," "+") should remain unchanged. Follow these steps:
+
+#### Frontend Implementation
+- **Analysis**:
+  - Compare the current Plus Menu layout (2x2 grid) with the desired layout from the Widgets page screenshot:
+    - Current: Four boxes in a 2x2 grid (`grid grid-cols-2 gap-2.5`), total size ~200x200px.
+    - Desired: Four boxes split into two rows, with two boxes per row, each box 100x100px, with a 10px horizontal gap between boxes in a row and a 10px vertical gap between rows.
+    - Each box should remain a white rounded card (`bg-white rounded-lg`) with a black icon (24x24px) and text, consistent with the original design.
+  - The Plus Menu should still appear centered above the navigation bar when the "+" icon is clicked.
+- **Structure Update**:
+  - Update `/frontend/src/components/PlusMenu.jsx` to adjust the layout of the four boxes.
+- **Functionality**:
+  - Maintain existing navigation: each box navigates to its respective route (`/log-exercise`, `/saved-foods`, `/food-database`, `/scan-food`).
+  - Ensure the "+" icon in the navigation bar still toggles the Plus Menu visibility.
+- **Implementation Steps**:
+  1. Open `/frontend/src/components/PlusMenu.jsx`.
+  2. Replace the current 2x2 grid layout (`grid grid-cols-2 gap-2.5`) with a flexbox layout to split the boxes into two rows:
+     - Use a parent `div` with `flex flex-col gap-2.5` to stack two rows vertically with a 10px gap.
+     - Inside, add two `div` elements (one for each row) with `flex flex-row gap-2.5` to place two boxes per row with a 10px horizontal gap.
+     - Each box should remain `w-24 h-24 bg-white rounded-lg flex flex-col items-center justify-center` (100x100px).
+     - Retain the icons (`FireIcon`, `BookOpenIcon`, `SearchIcon`, `CameraIcon` from `@heroicons/react/24/outline`) with `w-6 h-6 text-black`.
+  3. Adjust the parent container's positioning to remain centered: `absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-52` (total width ~208px to account for 2 boxes of 100px + 10px gap).
+  4. Ensure the overall height of the menu adjusts to ~208px (2 rows of 100px + 10px gap between rows).
+- **Testing**:
+  - Verify the Plus Menu now displays four boxes in two rows (2 boxes per row), with each box 100x100px, a 10px gap between boxes in a row, and a 10px gap between rows.
+  - Confirm the menu remains centered above the navigation bar when the "+" icon is clicked.
+  - Ensure each box retains its white rounded card design, black icon, and text, and navigates to the correct route.
+  - Test responsiveness on mobile and desktop, ensuring the layout scales proportionally without overlapping the navigation bar.
+
+#### Backend Implementation
+- **Analysis**:
+  - No backend changes are required as this update is purely visual.
+- **Structure Update**:
+  - Ensure existing Firebase routes remain functional.
+- **Functionality**:
+  - Maintain existing navigation logic.
+- **Testing**:
+  - Verify navigation routes still work after the layout change.
+
+#### Additional Instructions
+- Add comments in `PlusMenu.jsx` explaining the layout change (e.g., "// Changed from 2x2 grid to two rows with 2 boxes each to match Widgets page design").
+- Log a `console.log` to confirm rendering (e.g., `console.log('Plus Menu updated to two-row layout');`).
+- Use precise measurements (100x100px for boxes, 10px gaps) to match the Widgets page screenshot's design.
+
+This prompt updates the Plus Menu to split the four boxes into two rows with two boxes each, aligning with the layout observed in the Widgets page screenshot while preserving the existing design and functionality.

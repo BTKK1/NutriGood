@@ -1,0 +1,25 @@
+I need you to adjust the layout of my Home component in the React application to match the behavior shown in the two provided images. The goal is to ensure the "Main Stats Card" (displaying "2017 Calories left") appears only in the first tab (macro cards view) and is completely removed from the second tab (activity cards view). The second tab should look exactly like the reference image I previously provided (the second image), cloning the exact sizes of the boxes, icons, and text.
+
+Instructions
+Move the "Main Stats Card" to the First Tab:
+Take the <Card> section containing the "2017 Calories left" display, progress circle, and related text (currently located outside the scrollable sections) and move it into the first view (<div className="w-1/2 px-4 snap-start">) just above the macro cards grid. This ensures it appears only when the first tab is active, as shown in the first image.
+Remove from the Second Tab:
+Ensure the "Main Stats Card" does not appear in the second tab (<div className="w-1/2 px-4 snap-start"> containing the Steps, Calories burned, and Water tracking cards). The second tab should match the reference image exactly, showing only the two activity cards (Steps and Calories burned) and the water tracking card below them, with no calorie count card.
+Match the Second Tab to the Reference Image:
+The second tab should replicate the layout, sizes, and styling of the reference image (second image), including:
+The exact dimensions and spacing of the Steps and Calories burned cards.
+The size and placement of icons (e.g., ❤️ for Steps, 🔥 for Calories burned).
+The font size and alignment of text (e.g., "0" for Steps, "278" for Calories burned, and the breakdown of "Steps +0" and "Boxing +278").
+The water tracking card with "0 fl oz (0.0 cups)" and the "+" and "−" buttons, matching the reference image's design.
+Do not add or modify any other elements beyond ensuring this exact match.
+Preserve All Other Elements:
+Keep the app header, calendar strip, macro cards, water settings modal, trial notice, recently logged section, and navigation bar unchanged.
+Maintain the existing state management, scroll logic, and water settings functionality as they are.
+Reference Images
+First Image: Shows the current design with the "2017 Calories left" card above the macro cards (first tab). This should remain in the first tab.
+Second Image: Shows the desired second tab layout with only the Steps, Calories burned, and Water tracking cards. The second tab should clone this exactly.
+Notes
+Do not over-add features or modify anything beyond the specified changes.
+Use the existing CSS classes and structure to maintain consistency.
+After making the changes, provide the updated code or a screenshot of the second tab to verify it matches the reference image.
+Thank you for implementing this layout adjustment!

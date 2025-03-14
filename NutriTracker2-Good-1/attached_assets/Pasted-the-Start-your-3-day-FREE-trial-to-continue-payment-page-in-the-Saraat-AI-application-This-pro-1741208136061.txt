@@ -1,0 +1,84 @@
+the "Start your 3-day FREE trial to continue." payment page in the "Saraat AI" application. This prompt focuses on fixing the back arrow navigation (Error 404), making the "Restore" button functional, enabling the subscription plan switch (monthly/yearly), and ensuring the "Start My 3-Day Free Trial" button works correctly. Since you mentioned we haven’t hooked up the Stripe API yet, I’ll include a step for Replit to request your Stripe API details (publishable and secret keys) before proceeding with the integration. This prompt builds on the existing structure, ensuring the app name is "Saraat AI" and using your custom logo (already inserted in the project).
+
+plaintext
+
+Collapse
+
+Wrap
+
+Copy
+You are an expert fullstack developer with 30 years of experience, currently working on the "Saraat AI" calorie tracking web application in Replit, built with React.js for the frontend, Express.js for the backend, and Tailwind CSS for styling. We need to fix several issues with the payment page (`/frontend/src/components/Payment.jsx`) for the "Start your 3-day FREE trial to continue." screen, as shown in the screenshot. The issues are: the back arrow redirects to an Error 404 page, the "Restore" button doesn’t work, switching between monthly and yearly subscription plans doesn’t work, and the "Start My 3-Day Free Trial" button doesn’t work. We also haven’t hooked up the Stripe API yet, so we need Replit to request the necessary Stripe API details (publishable and secret keys) before proceeding with the integration. Ensure the app name is "Saraat AI" and use our custom logo (already inserted in the project). Here’s what to do:
+
+1. **Fix Back Arrow Navigation (Error 404)**
+   - In `/frontend/src/components/Payment.jsx`, update the back arrow (⬅️) navigation to correctly redirect to the previous page in the onboarding flow (e.g., "How to reach your goals" screen or the appropriate preceding step).
+   - Use React Router to handle navigation, ensuring the back arrow links to `/onboarding/goals-guide` or the correct route in `/frontend/src/App.jsx`. For example:
+     ```javascript
+     import { useNavigate } from 'react-router-dom';
+     const navigate = useNavigate();
+     <button onClick={() => navigate(-1)} className="absolute left-4 top-4 text-gray-500">&lt;</button>
+Test the navigation to ensure it redirects to the correct previous page without triggering an Error 404, maintaining the progress bar and layout consistency.
+Make the "Restore" Button Functional
+In /frontend/src/components/Payment.jsx, update the "Restore" link (top-right, styled with text-gray-500, cursor-pointer) to trigger a function that calls a backend endpoint to restore a subscription:
+On click, send a POST request to /api/payment/restore with the user’s email or subscription ID (stored in localStorage or state).
+Use fetch or axios to make the request, and display a confirmation message (e.g., "Subscription restored successfully") or error message (e.g., "Subscription not found") using a modal or alert, styled with Tailwind CSS (bg-white, text-black, rounded-lg).
+In /backend/routes/payment.js, ensure the POST endpoint /api/payment/restore is implemented to handle subscription restoration:
+Use Stripe’s API (stripe.subscriptions.retrieve and stripe.subscriptions.update) to retrieve and reactivate a user’s subscription based on their subscriptionId or email in the users table (ensure a subscriptionId column exists in /backend/db.js).
+Return a success message or error as JSON, updating the user’s status in the database.
+Test the "Restore" button to ensure it works correctly, displaying appropriate feedback.
+Enable Switching Between Monthly and Yearly Plans
+In /frontend/src/components/Payment.jsx, update the radio buttons for subscription plans ("Monthly: SAR 39.99/mo" and "Yearly: SAR 10.83/mo") to allow users to switch between plans dynamically:
+Use React state (e.g., selectedPlan) to track the user’s selection, updating the UI when the radio button changes. For example:
+javascript
+
+Collapse
+
+Wrap
+
+Copy
+const [selectedPlan, setSelectedPlan] = useState('yearly');
+<div className="flex space-x-4">
+  <label className="bg-white rounded-lg shadow-md p-4 cursor-pointer">
+    <input type="radio" name="plan" value="monthly" checked={selectedPlan === 'monthly'} onChange={() => setSelectedPlan('monthly')} className="mr-2" />
+    Monthly: SAR 39.99/mo
+  </label>
+  <label className="bg-white rounded-lg shadow-md p-4 cursor-pointer">
+    <input type="radio" name="plan" value="yearly" checked={selectedPlan === 'yearly'} onChange={() => setSelectedPlan('yearly')} className="mr-2" />
+    Yearly: SAR 10.83/mo <span className="bg-black text-white rounded px-2">3 DAYS FREE</span>
+  </label>
+</div>
+Ensure the "Yearly" plan is pre-selected by default, with the "3 DAYS FREE" badge styled with bg-black, text-white, rounded.
+Pass the selectedPlan value to the Stripe integration when the "Start My 3-Day Free Trial" button is clicked, so the backend can use the appropriate price ID (yearly: SAR 129.99/year, or monthly: SAR 39.99/mo).
+Test switching between plans to ensure the UI updates correctly and the selected plan is reflected in the Stripe subscription setup.
+Fix the "Start My 3-Day Free Trial" Button
+In /frontend/src/components/Payment.jsx, update the "Start My 3-Day Free Trial" button to initiate the Stripe subscription setup correctly:
+Use Stripe’s @stripe/stripe-js library to call stripe.redirectToCheckout or stripe.confirmCardPayment when the button is clicked, creating a customer and setting up a 3-day free trial subscription for the selected plan (yearly SAR 129.99/year or monthly SAR 39.99/mo), without collecting payment initially.
+Ensure the trial period ends 3 days from the current date (e.g., March 8, 2025, for today’s date, March 5, 2025), dynamically calculated using JavaScript’s Date object.
+Upon success, redirect the user to /create-account using React Router.
+Handle errors with a modal or alert, styled with Tailwind CSS (bg-white, text-black, rounded-lg).
+Ensure the button is disabled until the "No Payment Due Now" checkbox is checked, using state to manage this logic.
+Request Stripe API Details for Integration
+Before proceeding with the Stripe integration, Replit should request the necessary Stripe API details from the user. Pause the implementation and output the following message:
+text
+
+Collapse
+
+Wrap
+
+Copy
+Please provide your Stripe publishable key and secret key to proceed with the Stripe integration. You can find these in your Stripe dashboard under API keys. Enter the publishable key (e.g., pk_...) and secret key (e.g., sk_...) in Replit’s Secrets or as environment variables (STRIPE_PUBLISHABLE_KEY and STRIPE_SECRET_KEY).
+Once the keys are provided, Replit can continue with the Stripe integration steps outlined below.
+Backend: Stripe Integration with Provided Keys
+Once the Stripe API keys are provided, update /backend/routes/payment.js to use the STRIPE_SECRET_KEY environment variable for Stripe initialization:
+Use the stripe Node.js package to create a customer, set up a subscription with a 3-day trial, and handle webhooks as described in previous prompts.
+Ensure the endpoint /api/payment/trial uses the selected plan (yearly or monthly) to set the appropriate price ID in Stripe, and /api/payment/restore uses the secret key for subscription restoration.
+Update /backend/db.js to ensure the users table has a subscriptionId column to store Stripe subscription IDs.
+Integration and Testing
+Ensure Payment.jsx integrates seamlessly with the existing onboarding flow (back arrow, progress bar) and React Router setup in /frontend/src/App.jsx.
+Test the changes in Replit to verify:
+The back arrow navigates correctly to the previous page without Error 404.
+The "Restore" button restores subscriptions accurately, displaying feedback.
+Switching between monthly and yearly plans works, updating the UI and Stripe subscription setup.
+The "Start My 3-Day Free Trial" button initiates the Stripe trial correctly, redirects to /create-account on success, and handles errors appropriately.
+The UI matches the exact design from the screenshot (including colors, layout, icons, and text), remains responsive, and uses our custom "Saraat AI" logo throughout.
+Provide comments in the code for clarity and scalability, ensuring secure handling of Stripe keys and subscription logic.
+Once these updates are implemented and tested, the payment page will function correctly with Stripe integration, fixing all reported issues and requesting your Stripe API details before proceeding.

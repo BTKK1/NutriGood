@@ -1,0 +1,51 @@
+You are an expert fullstack developer with 30 years of experience, currently working on the "Saraat AI" calorie tracking web application in Replit, built with React.js for the frontend, Express.js for the backend, and Tailwind CSS for styling. We need to update the payment page in `/frontend/src/components/Payment.jsx` to implement the "Start your 3-day FREE trial to continue." screen with Stripe integration, exactly as shown in the screenshot. Ensure the app name is "Saraat AI" and use our custom logo (already inserted in the project). Here’s what to do:
+
+1. **Frontend: Update the Payment Page with Stripe Integration**
+   - Modify `/frontend/src/components/Payment.jsx` to include the third payment screen ("Start your 3-day FREE trial to continue."), matching the design from the screenshot:
+     - Display "Start your 3-day FREE trial to continue." in bold, black text.
+     - Show a vertical timeline with three points, styled with Tailwind CSS (`text-gray-500` for text, `bg-orange-200` for icons):
+       - 🗝️ "Today: Unlock all the app’s features like AI calorie scanning and more."
+       - 🔔 "In 2 Days – Reminder: We’ll send you a reminder that your trial is ending soon."
+       - 👑 "In 3 Days – Billing Starts: You’ll be charged on 8 Mar 2025 unless you cancel anytime before."
+     - Include radio buttons for subscription plans, styled with Tailwind CSS (`bg-white`, `rounded-lg`, `shadow-md`):
+       - "Monthly: SAR 39.99/mo" (unselected, with a radio circle)
+       - "Yearly: SAR 10.83/mo" (pre-selected with a checkmark, styled with `bg-black`, `text-white`)
+     - Include a checkbox "No Payment Due Now" (✔, styled with `text-gray-500`) above the button.
+     - Add a "Start My 3-Day Free Trial" button (black with white text, rounded corners) to initiate the Stripe subscription setup.
+     - Add text "3 days free, then SAR 129.99 per year (SAR 10.83/mo)" in gray below the button.
+     - Include a "Restore" link in gray at the top-right for subscription recovery, styled with `text-gray-500`, `cursor-pointer`.
+     - Ensure the layout includes a back arrow (⬅️) and progress bar at the top, centered content, and responsiveness with Tailwind CSS.
+   - Integrate Stripe for payment processing using the `@stripe/stripe-js` library:
+     - Install Stripe in Replit (`npm install @stripe/stripe-js stripe`).
+     - Initialize Stripe in `Payment.jsx` with your publishable key (stored as an environment variable, e.g., `STRIPE_PUBLISHABLE_KEY` in Replit).
+     - When the "Start My 3-Day Free Trial" button is clicked, use Stripe’s `stripe.redirectToCheckout` or `stripe.confirmCardPayment` to create a customer and set up a 3-day free trial subscription for SAR 129.99/year (billed SAR 10.83/mo after trial, or SAR 39.99/mo for monthly based on user selection), without collecting payment initially. Use the `trial_period_days` parameter to set a 3-day trial ending on March 8, 2025 (or 3 days from the current date, dynamically calculated).
+     - Handle the subscription plan selection (yearly or monthly) via state, passing the appropriate price ID to Stripe (e.g., create price IDs in your Stripe dashboard for SAR 129.99/year and SAR 39.99/mo).
+
+2. **Backend: Stripe Integration and Subscription Logic**
+   - In `/backend/routes/payment.js`, update or create the POST endpoint `/api/payment/trial` to handle Stripe integration for this specific page:
+     - Accept user data (e.g., email, selected plan—yearly or monthly) in the request body.
+     - Use Stripe’s Node.js library (`stripe`) with your secret key (stored securely as an environment variable, e.g., `STRIPE_SECRET_KEY` in Replit) to:
+       - Create a customer using `stripe.customers.create` with the user’s email.
+       - Set up a subscription with a 3-day trial using `stripe.subscriptions.create`, specifying the price for the selected plan (yearly: SAR 129.99/year, or monthly: SAR 39.99/mo), with `trial_period_days: 3` and a trial end date of March 8, 2025 (or 3 days from the current date, dynamically calculated using JavaScript’s `Date` object).
+       - Store the subscription ID in the `users` table (ensure a `subscriptionId` column exists in `/backend/db.js`).
+     - Return a success response (e.g., `{ success: true, subscriptionId: 'sub_...' }`) or error as JSON, redirecting the frontend to `/create-account` upon success.
+     - Implement Stripe webhooks to handle trial expiration, billing events, and subscription updates, updating the user’s status in the `users` table (e.g., `trialActive`, `subscriptionStatus`).
+     - Ensure error handling, validation, and secure storage of Stripe keys.
+
+3. **Frontend and Backend: Make the "Restore" Button Functional**
+   - In `/frontend/src/components/Payment.jsx`, update the "Restore" link (top-right, styled with `text-gray-500`, `cursor-pointer`) to trigger a function that calls a backend endpoint to restore a subscription:
+     - On click, send a POST request to `/api/payment/restore` with the user’s email or subscription ID (stored in localStorage or state).
+   - In `/backend/routes/payment.js`, update or create a POST endpoint `/api/payment/restore` to handle subscription restoration:
+     - Use Stripe’s API (`stripe.subscriptions.retrieve` and `stripe.subscriptions.update`) to retrieve and reactivate a user’s subscription based on their `subscriptionId` or email in the `users` table.
+     - Return a success message or error as JSON, updating the user’s status in the database.
+   - Ensure the frontend displays a confirmation message (e.g., "Subscription restored successfully") or error message (e.g., "Subscription not found") using a modal or alert, styled with Tailwind CSS (`bg-white`, `text-black`, `rounded-lg`).
+
+4. **Integration and Testing**
+   - Ensure the `Payment.jsx` component integrates seamlessly with the existing onboarding flow (back arrow, progress bar) and React Router setup in `/frontend/src/App.jsx`.
+   - Test the changes in Replit to verify:
+     - Stripe integration works correctly for the 3-day free trial and subscription setup (yearly SAR 129.99/year or monthly SAR 39.99/mo).
+     - The "Restore" button restores subscriptions accurately, displaying appropriate feedback.
+     - The UI matches the exact design from the screenshot (including colors, layout, icons, and text), remains responsive, and uses our custom "Saraat AI" logo throughout.
+   - Provide comments in the code for clarity and scalability, ensuring secure handling of Stripe keys and subscription logic.
+
+Once these updates are implemented and tested, the "Start your 3-day FREE trial to continue." page will function with Stripe integration, the "Restore" button will work, and users will be redirected to the account creation page after starting the trial, ensuring a seamless user experience for "Saraat AI."

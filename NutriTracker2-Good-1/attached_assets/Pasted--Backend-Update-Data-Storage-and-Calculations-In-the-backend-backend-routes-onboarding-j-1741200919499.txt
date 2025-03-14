@@ -1,0 +1,18 @@
+**Backend: Update Data Storage and Calculations**
+   - In the backend (`/backend/routes/onboarding.js`), update the existing API endpoints or create new ones to handle the new user inputs:
+     - POST `/api/onboarding/goal`: Accepts a JSON payload with a `goal` field (e.g., "Lose weight," "Maintain," "Gain weight") and stores it in the `users` table, adding a `goal` column or updating the existing schema.
+     - POST `/api/onboarding/weight-speed`: Accepts a JSON payload with a `weightSpeed` field (e.g., "0.1kg," "0.8kg," "1.5kg") and stores it in the `users` table, adding a `weightSpeed` column.
+     - POST `/api/onboarding/dietary-prefs`: Accepts a JSON payload with a `dietaryPrefs` field (e.g., "Vegan," "Default," "Vegetarian," "Pescatarian") and stores it in the `users` table, adding a `dietaryPrefs` column.
+   - Update `/backend/db.js` to modify the `users` table schema to include `goal`, `weightSpeed`, and `dietaryPrefs` columns, ensuring data types and constraints are appropriate (e.g., strings or enums).
+   - In `/backend/routes/recommendations.js`, update the GET `/api/recommendations` endpoint to incorporate these new fields into the daily recommendation calculations:
+     - Adjust calorie and macronutrient recommendations based on the `goal`:
+       - "Lose weight": Subtract a calorie deficit (e.g., 500 calories/day for 0.5 kg/week, scaled for 0.1 kg, 0.8 kg, or 1.5 kg/week—e.g., 0.1 kg/week = 250 kcal deficit, 0.8 kg/week = 2000 kcal deficit, 1.5 kg/week = 3750 kcal deficit, adjusted for safety and realism).
+       - "Maintain": Use the BMR × activity level without deficit/surplus.
+       - "Gain weight": Add a calorie surplus (e.g., 250–500 calories/day, scaled for weight speed).
+     - Adjust macronutrient distribution based on `dietaryPrefs`:
+       - "Vegan": Ensure no animal products, adjust protein sources (e.g., increase plant-based protein to 35% of calories, reduce fats to 25%, increase carbs to 40%).
+       - "Default": Standard 40% carbs, 30% protein, 30% fats.
+       - "Vegetarian": No meat, adjust protein sources (e.g., increase plant-based and dairy/egg protein).
+       - "Pescatarian": Include fish, adjust protein and fats accordingly (e.g., increase omega-3 fats).
+     - Use the `weightSpeed` to calculate the total calorie deficit/surplus needed to reach the user’s goal weight by the target date (from the "Congratulations" screen), distributing it daily.
+   - Ensure the backend validates inputs, handles errors, and returns JSON responses with the updated recommendations (calories, carbs, protein, fats).

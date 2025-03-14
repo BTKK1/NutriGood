@@ -1,0 +1,182 @@
+1. New File: ScanGuidePopup.tsx
+This will be a reusable component that manages the scan guide popup state and logic globally.
+
+jsx
+
+Collapse
+
+Wrap
+
+Copy
+import { Card } from "@/components/ui/card";
+import { CheckCircle } from "lucide-react";
+import ScanGuide from "@/assets/images/ScanGuide.png";
+import { useState, useEffect } from "react";
+
+export default function ScanGuidePopup({ onScanNow }: { onScanNow: () => void }) {
+  const [showScanGuide, setShowScanGuide] = useState(false);
+
+  useEffect(() => {
+    const hasSeenGuide = localStorage.getItem("hasSeenScanGuide");
+    if (!hasSeenGuide) {
+      setShowScanGuide(true);
+    }
+  }, []);
+
+  const handleClose = () => {
+    localStorage.setItem("hasSeenScanGuide", "true");
+    setShowScanGuide(false);
+  };
+
+  if (!showScanGuide) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <Card className="p-6 bg-white rounded-xl w-11/12 max-w-lg mx-auto shadow-2xl relative">
+        <button
+          onClick={handleClose}
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+        >
+          ×
+        </button>
+        <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+          Best scanning practices
+        </h3>
+        <div className="flex justify-between mb-6">
+          <div className="text-center">
+            <div className="flex justify-center items-center mb-2">
+              <CheckCircle className="w-6 h-6 text-green-600 mr-2" />
+              <p className="text-lg font-medium text-green-600">Do</p>
+            </div>
+            <img src={ScanGuide} alt="Do" className="w-32 h-auto mx-auto" />
+          </div>
+          <div className="text-center">
+            <div className="flex justify-center items-center mb-2">
+              <div className="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center mr-2">
+                <span className="text-red-600 font-bold">×</span>
+              </div>
+              <p className="text-lg font-medium text-red-600">Don't</p>
+            </div>
+            <img src={ScanGuide} alt="Don't" className="w-32 h-auto mx-auto" />
+          </div>
+        </div>
+        <div className="space-y-2 text-left">
+          <p className="text-lg font-medium">General tips:</p>
+          <ul className="list-disc pl-5 space-y-2 text-base text-gray-700">
+            <li>Keep the food inside the scan lines</li>
+            <li>Hold your phone still so the image is not blurry</li>
+            <li>Don't take the picture at obscure angles</li>
+          </ul>
+        </div>
+        <button
+          onClick={() => {
+            handleClose();
+            onScanNow();
+          }}
+          className="w-full py-3 bg-black text-white rounded-xl text-lg font-semibold mt-6"
+        >
+          Scan now
+        </button>
+      </Card>
+    </div>
+  );
+}
+Key Features:
+Uses its own showScanGuide state, initialized based on localStorage.
+Accepts an onScanNow prop to handle navigation to the ScanFood page after dismissing the guide.
+The popup is displayed only if not previously seen and can be dismissed with "×" or "Scan now."
+2. New File: ScanFood.tsx
+This will be the page navigated to after the guide is dismissed.
+
+jsx
+
+Collapse
+
+Wrap
+
+Copy
+import { Card } from "@/components/ui/card";
+import { Camera } from "lucide-react";
+
+export default function ScanFood() {
+  return (
+    <div className="min-h-screen bg-gray-100 p-4">
+      <Card className="p-6 shadow-lg text-center">
+        <h1 className="text-2xl font-bold mb-4">Scan Food</h1>
+        <p className="text-gray-600 mb-4">Use your camera to scan food items.</p>
+        <button className="w-full py-3 bg-black text-white rounded-xl text-lg font-semibold flex items-center justify-center gap-2">
+          <Camera className="w-6 h-6" />
+          Start Scanning
+        </button>
+      </Card>
+    </div>
+  );
+}
+Key Features:
+A simple page with a "Start Scanning" button (you can expand this with actual camera functionality later).
+Maintains a consistent design with the Home page.
+3. Updated ActionMenu File
+Here’s the revised ActionMenu component to trigger the global ScanGuidePopup:
+
+jsx
+
+Collapse
+
+Wrap
+
+Copy
+import { Link } from "wouter";
+import { Dumbbell, BookmarkCheck, Search, Camera } from "lucide-react";
+
+export default function ActionMenu({ onClose, onScanFood }: { onClose: () => void; onScanFood: () => void }) {
+  return (
+    <div className="fixed inset-0 bg-black/30 z-50" onClick={onClose}>
+      <div 
+        className="fixed bottom-24 left-1/2 -translate-x-1/2" 
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Menu layout with rectangular buttons */}
+        <div className="flex flex-col gap-2.5">
+          <div className="flex gap-2.5">
+            <Link href="/exercise" onClick={onClose}>
+              <button className="w-[120px] h-[80px] bg-white rounded-lg shadow-md hover:bg-gray-50 transition-colors flex flex-col items-center justify-center gap-1.5">
+                <Dumbbell className="w-6 h-6" />
+                <span className="text-[13px] font-medium">Log exercise</span>
+              </button>
+            </Link>
+
+            <Link href="/food/saved" onClick={onClose}>
+              <button className="w-[120px] h-[80px] bg-white rounded-lg shadow-md hover:bg-gray-50 transition-colors flex flex-col items-center justify-center gap-1.5">
+                <BookmarkCheck className="w-6 h-6" />
+                <span className="text-[13px] font-medium">Saved foods</span>
+              </button>
+            </Link>
+          </div>
+
+          <div className="flex gap-2.5">
+            <Link href="/food/database" onClick={onClose}>
+              <button className="w-[120px] h-[80px] bg-white rounded-lg shadow-md hover:bg-gray-50 transition-colors flex flex-col items-center justify-center gap-1.5">
+                <Search className="w-6 h-6" />
+                <span className="text-[13px] font-medium">Food Database</span>
+              </button>
+            </Link>
+
+            <button
+              onClick={() => {
+                onScanFood();
+                onClose();
+              }}
+              className="w-[120px] h-[80px] bg-white rounded-lg shadow-md hover:bg-gray-50 transition-colors flex flex-col items-center justify-center gap-1.5"
+            >
+              <Camera className="w-6 h-6" />
+              <span className="text-[13px] font-medium">Scan food</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+Changes:
+No structural changes to the layout or styling.
+The "Scan food" button still uses onScanFood and onClose, ensuring compatibility with the global popup approach.

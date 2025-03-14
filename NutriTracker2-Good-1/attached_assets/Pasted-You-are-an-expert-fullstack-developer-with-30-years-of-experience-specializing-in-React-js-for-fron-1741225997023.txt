@@ -1,0 +1,52 @@
+You are an expert fullstack developer with 30 years of experience, specializing in React.js for frontend development, Tailwind CSS for styling, and Firebase (Authentication, Firestore, Realtime Database, Cloud Functions) for backend development. You are currently working on the "Saraat AI" calorie tracking web application in Replit, following the detailed prompts provided earlier to clone the app from the 10 screenshots. The user has reviewed the implementation and requested a change: replace the emoji icons (e.g., 🏆, 🌱) used in the Analytics page with the black default icons (e.g., weight icon, bar graph icon) observed in the original screenshots' navigation bar and other elements. This update applies specifically to the `/frontend/src/components/AnalyticsPage.jsx` component, which was built in Prompt 10. Ensure the icons match the minimalist black design of the original app, using the same icon set as the navigation bar ("Home," "Analytics," "Settings," "+"), and maintain the seamless experience. Do not alter any other functionality or backend logic unless necessary to support this change. Follow these steps:
+
+#### Frontend Implementation
+- **Analysis**:
+  - Review the current `AnalyticsPage.jsx` to identify where emoji icons (e.g., 🏆 for "Goal Weight," 🌱 for "Current Weight") are used.
+  - Compare with the original screenshot, noting the use of black default icons (e.g., weight icon for weight-related sections, bar graph for analytics) in the navigation and other UI elements.
+- **Structure Update**:
+  - Replace the emoji icons in the "Goal Weight" and "Current Weight" sections with the corresponding black default icons from the `@heroicons/react` library (e.g., `WeightIcon`, `ChartBarIcon`) or a similar icon set matching the navigation bar's style.
+  - Ensure the "Update" and "Update your weight" buttons retain their black button styling with Tailwind CSS.
+  - Keep the BMI section and "Goal Progress" tabs unchanged, focusing only on icon replacement.
+- **Functionality**:
+  - Maintain the existing functionality: clicking "Update" navigates to a weight update form, and the "Update your weight" button triggers a weight update action.
+  - Ensure the new icons are clickable (if applicable) and styled consistently with the navigation bar icons (black, 24x24px, centered).
+- **Implementation Steps**:
+  1. Open `/frontend/src/components/AnalyticsPage.jsx`.
+  2. Install `@heroicons/react` if not already installed: `npm install @heroicons/react` in Replit.
+  3. Import the required icons (e.g., `import { WeightIcon, ChartBarIcon } from '@heroicons/react/24/outline';`).
+  4. Replace the emoji 🏆 with `<WeightIcon className="w-6 h-6 text-black" />` for "Goal Weight 118 lbs".
+  5. Replace the emoji 🌱 with `<WeightIcon className="w-6 h-6 text-black" />` for "Current Weight 118 lbs".
+  6. Verify the navigation bar icons (Home, Analytics, Settings, +) use the same `@heroicons/react` set and adjust if necessary to match (e.g., `HomeIcon`, `ChartBarIcon`, `CogIcon`, `PlusIcon`).
+  7. Ensure Tailwind CSS classes (e.g., `w-6 h-6`, `text-black`) align the icons with the original design.
+  8. Test the page to confirm icon rendering and navigation functionality.
+- **Testing**:
+  - Verify the new icons display correctly in place of emojis, matching the black minimalist style of the navigation bar.
+  - Ensure clicking "Update" and "Update your weight" still works as expected.
+  - Check responsiveness on mobile and desktop, ensuring icons scale appropriately.
+  - Confirm the BMI scale and "Goal Progress" tabs remain unaffected.
+
+#### Backend Implementation
+- **Analysis**:
+  - No backend changes are required unless the icon replacement affects data display (e.g., if icons were tied to Firebase data fields).
+- **Structure Update**:
+  - If any Firebase data fields were linked to emoji icons (unlikely), ensure the frontend update does not break data retrieval.
+- **Functionality**:
+  - Maintain existing Firebase logic for weight, BMI, and goal progress storage and calculation.
+- **Implementation Steps**:
+  1. Review `/backend/functions/index.js` and `/backend/firebase.js` to ensure no icon-related data dependencies exist.
+  2. If dependencies are found, update the frontend to map new icon names to existing data fields.
+  3. Otherwise, skip backend changes.
+- **Testing**:
+  - Verify weight and BMI data still loads correctly from Firestore.
+  - Ensure Cloud Functions for BMI calculation remain unaffected.
+
+#### Additional Instructions
+- Provide detailed comments in the updated `AnalyticsPage.jsx` explaining the icon replacement (e.g., "// Replaced 🏆 with WeightIcon to match original design").
+- Log a `console.log` in the component to confirm icon rendering (e.g., `console.log('Icons updated to WeightIcon and ChartBarIcon');`).
+- Ensure the change aligns with the original screenshot's aesthetic, avoiding any emoji usage throughout the component.
+- Deliver the updated `AnalyticsPage.jsx` code with the changes, ensuring no other parts of the app are inadvertently modified.
+
+This update will replace emoji icons with the black default icons from the original design, maintaining the app's visual consistency and functionality as requested by the user.
+
+This prompt ensures the Replit AI agent focuses solely on updating the icon usage in the Analytics page, leveraging the existing @heroicons/react library to match the navigation bar's black icons, while preserving the fullstack integrity of the application. Let me know if you need further adjustments!

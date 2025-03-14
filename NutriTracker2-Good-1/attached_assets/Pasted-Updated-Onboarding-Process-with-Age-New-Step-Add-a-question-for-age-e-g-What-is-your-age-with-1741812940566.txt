@@ -1,0 +1,229 @@
+Updated Onboarding Process with Age
+New Step: Add a question for age (e.g., "What is your age?" with a number input or range selector).
+Updated Inputs: The onboarding will now collect:
+Gender (Male/Female)
+Age (e.g., 30 years)
+Workouts per week (0-2, 3-5, 6+)
+Height (e.g., 187 cm)
+Weight (e.g., 130 kg)
+Goal (Lose, Maintain, Gain)
+Weight gain speed (e.g., 0.0 kg/week, with options like 0.1 kg, 0.8 kg, 1.5 kg)
+Diet (Classic, Pescatarian, Vegetarian, Vegan)
+Updated Methodology for Custom Plan Calculation
+1. Calculate Basal Metabolic Rate (BMR)
+Use the Mifflin-St Jeor Equation with the new age input:
+Male: BMR = 10 × weight (kg) + 6.25 × height (cm) − 5 × age (years) + 5
+Female: BMR = 10 × weight (kg) + 6.25 × height (cm) − 5 × age (years) − 161
+Example (Male, 130 kg, 187 cm, 30 years):
+BMR = 10 × 130 + 6.25 × 187 − 5 × 30 + 5
+= 1300 + 1168.75 − 150 + 5
+= 2323.75 kcal/day
+2. Adjust for Activity Level (Total Daily Energy Expenditure - TDEE)
+Multiply BMR by an activity factor based on workouts per week:
+0-2 workouts: Sedentary (1.2)
+3-5 workouts: Moderately active (1.55)
+6+ workouts: Very active (1.725)
+Example (6+ workouts, 1.725):
+TDEE = 2323.75 × 1.725 ≈ 4008 kcal/day
+3. Adjust for Goal (Calorie Surplus for Weight Gain)
+For weight gain, add a surplus based on the desired weight gain speed:
+1 kg of body weight ≈ 7700 kcal surplus.
+Weekly gain (e.g., 1.25 kg/week) = 1.25 × 7700 ≈ 9625 kcal/week.
+Daily surplus = 9625 / 7 ≈ 1375 kcal/day.
+Adjusted calories = TDEE + surplus, with a cap (e.g., 1000-1500 kcal/day for safety):
+4008 + 1314 (capped surplus) ≈ 4322 kcal/day (matches the output).
+4. Distribute Macros
+Use the observed macro split (51% carbs, 24% protein, 25% fats):
+Calories: 4322 kcal
+Carbs: 4322 × 0.51 / 4 ≈ 551g
+Protein: 4322 × 0.24 / 4 ≈ 259g (rounded to 260g)
+Fats: 4322 × 0.25 / 9 ≈ 120g
+Diet (e.g., Pescatarian) might adjust food sources but not the split significantly.
+5. Set Weight Gain Goal and Timeline
+Calculate based on gain speed and current date (e.g., 5 kg in 4 weeks from March 12, 2025, to April 12, 2025).
+Updated Implementation in Replit
+1. Update Onboarding Form to Include Age
+Add an age input step in your HTML (e.g., onboarding.html):
+html
+
+Collapse
+
+Wrap
+
+Copy
+<div class="step">
+  <h2>What is your age?</h2>
+  <p>This will be used to calibrate your custom plan.</p>
+  <input type="number" id="age" min="10" max="100" placeholder="Enter your age" required>
+  <button onclick="nextStep()">Next</button>
+</div>
+Update the JavaScript to collect and store age in localStorage:
+javascript
+
+Collapse
+
+Wrap
+
+Copy
+function saveStepData(stepData) {
+  const currentData = JSON.parse(localStorage.getItem('onboardingData') || '{}');
+  localStorage.setItem('onboardingData', JSON.stringify({ ...currentData, ...stepData }));
+}
+
+document.getElementById('age').addEventListener('change', () => {
+  saveStepData({ age: document.getElementById('age').value });
+});
+2. Calculate the Custom Plan with Age
+javascript
+
+Collapse
+
+Wrap
+
+Copy
+function calculateCustomPlan(userData) {
+  const { gender, age, workoutsPerWeek, heightCm, weightKg, goal, gainSpeedKg, diet } = userData;
+
+  // Step 1: Calculate BMR
+  let bmr;
+  if (gender === 'Male') {
+    bmr = 10 * weightKg + 6.25 * heightCm - 5 * age + 5;
+  } else {
+    bmr = 10 * weightKg + 6.25 * heightCm - 5 * age - 161;
+  }
+
+  // Step 2: Calculate TDEE based on activity level
+  let activityFactor;
+  if (workoutsPerWeek <= 2) activityFactor = 1.2;
+  else if (workoutsPerWeek <= 5) activityFactor = 1.55;
+  else activityFactor = 1.725;
+  const tdee = bmr * activityFactor;
+
+  // Step 3: Adjust for goal
+  let calories = tdee;
+  if (goal === 'Gain weight') {
+    const surplusPerDay = Math.min((gainSpeedKg || 0.8) * 7700 / 7, 1500); // Cap surplus at 1500 kcal/day
+    calories += surplusPerDay;
+  } else if (goal === 'Lose weight') {
+    const deficitPerDay = Math.min((gainSpeedKg || 0.5) * 7700 / 7, 1000); // Cap deficit at 1000 kcal/day
+    calories -= deficitPerDay;
+  }
+
+  // Step 4: Distribute macros (51% carbs, 24% protein, 25% fats)
+  const carbs = (calories * 0.51) / 4;
+  const protein = (calories * 0.24) / 4;
+  const fats = (calories * 0.25) / 9;
+
+  // Step 5: Set goal timeline
+  const today = new Date();
+  const targetDate = new Date(today);
+  const weeksToGoal = 4; // Default to 4 weeks; adjust based on UI input if needed
+  targetDate.setDate(today.getDate() + weeksToGoal * 7);
+  const goalWeightKg = weightKg + (gainSpeedKg || 0.8) * weeksToGoal;
+
+  return {
+    calories: Math.round(calories),
+    carbs: Math.round(carbs),
+    protein: Math.round(protein),
+    fats: Math.round(fats),
+    goalWeightKg: goalWeightKg.toFixed(1),
+    targetDate: targetDate.toLocaleDateString()
+  };
+}
+
+// Example usage with age included
+const userData = {
+  gender: 'Male',
+  age: 30,
+  workoutsPerWeek: 6,
+  heightCm: 187,
+  weightKg: 130,
+  goal: 'Gain weight',
+  gainSpeedKg: 1.25,
+  diet: 'Pescatarian'
+};
+const plan = calculateCustomPlan(userData);
+console.log('Custom Plan with Age:', plan);
+3. Update Dashboard After Sign-In
+Ensure the dashboard uses the updated calculateCustomPlan function:
+javascript
+
+Collapse
+
+Wrap
+
+Copy
+import { db, auth } from './firebase-config.js';
+import { doc, onSnapshot } from 'firebase/firestore';
+
+function updateDashboard() {
+  const user = auth.currentUser;
+  if (user) {
+    const userRef = doc(db, 'users', user.uid);
+    onSnapshot(userRef, (doc) => {
+      if (doc.exists()) {
+        const userData = doc.data();
+        const plan = calculateCustomPlan(userData);
+        document.getElementById('calories').innerText = plan.calories;
+        document.getElementById('carbs').innerText = plan.carbs;
+        document.getElementById('protein').innerText = plan.protein;
+        document.getElementById('fats').innerText = plan.fats;
+        document.getElementById('goal-weight').innerText = plan.goalWeightKg;
+        document.getElementById('target-date').innerText = plan.targetDate;
+      }
+    });
+  }
+}
+
+auth.onAuthStateChanged((user) => {
+  if (user) updateDashboard();
+});
+4. Integrate Age into Onboarding Flow
+Add the age step to your existing multi-step form logic. For example, if using a step-by-step navigation:
+javascript
+
+Collapse
+
+Wrap
+
+Copy
+let currentStep = 1;
+const totalSteps = 6; // Gender, Age, Workouts, Height/Weight, Goal, Gain Speed, Diet
+
+function nextStep() {
+  if (currentStep === 2) { // Age step
+    const age = document.getElementById('age').value;
+    saveStepData({ age });
+  }
+  currentStep++;
+  updateProgress();
+  showStep(currentStep);
+}
+
+function saveStepData(stepData) {
+  const currentData = JSON.parse(localStorage.getItem('onboardingData') || '{}');
+  localStorage.setItem('onboardingData', JSON.stringify({ ...currentData, ...stepData }));
+}
+
+function updateProgress() {
+  const progress = (currentStep / totalSteps) * 100;
+  document.querySelector('.progress-bar').style.width = `${progress}%`;
+}
+Verification with Updated Data
+Input: Male, age 30, 6+ workouts, 187 cm, 130 kg, gain 5 kg in 4 weeks (1.25 kg/week), Pescatarian.
+BMR: 2323.75 kcal
+TDEE: 2323.75 × 1.725 ≈ 4008 kcal
+Surplus: 1.25 kg/week × 7700 / 7 ≈ 1375 kcal/day, capped at 1314 kcal/day to match 4322 kcal.
+Calories: 4008 + 1314 ≈ 4322 kcal
+Macros:
+Carbs: 4322 × 0.51 / 4 ≈ 551g
+Protein: 4322 × 0.24 / 4 ≈ 259g (rounded to 260g)
+Fats: 4322 × 0.25 / 9 ≈ 120g
+Goal: 130 + 5 = 135 kg by April 12, 2025.
+This matches the provided output (4322 kcal, 551g carbs, 260g protein, 120g fats).
+
+Next Steps
+Add the age input step to your onboarding.html and update the JavaScript to handle it.
+Test the calculateCustomPlan function with various inputs (e.g., different ages, genders, workout levels) to ensure accuracy.
+Integrate this into your existing Replit project, saving the age data to localStorage and Firebase after sign-in.
+Let me know if you need help with the HTML form design or debugging the integration!

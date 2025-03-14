@@ -1,0 +1,41 @@
+How It Should Work
+Intended Flow:
+A user starts at the root (/) and is directed to the /auth page to sign up.
+After successful sign-up, they should be redirected to /onboarding to complete their setup, and only then proceed to /home.
+Expected Behavior: The app should recognize a new user (someone who just signed up) and enforce the /onboarding step before allowing access to /home.
+How It’s Actually Working
+Current Flow:
+The user goes from / to /auth and signs up.
+Immediately after sign-up, they’re redirected to /home instead of /onboarding.
+Observed Behavior: The app isn’t properly identifying new users or enforcing the onboarding step, causing the skip to /home.
+Why This Might Be Happening
+Based on the activity log and the fixes attempted, here are the likely reasons:
+
+Authentication State Listener Override:
+The onAuthStateChanged listener in App.tsx (or a similar auth handler) might be triggering a default redirect to /home as soon as a user is authenticated, overriding the intended /onboarding redirect set in auth.tsx. This could happen if the listener doesn’t check for a "new user" flag or status correctly.
+Timing Issue with Flag Setting:
+The new_user flag (stored in sessionStorage) or onboardingComplete flag (in the database) might not be set or checked in time during the sign-up process. If the redirect logic runs before these flags are updated, the app assumes the user is an existing user and sends them to /home.
+Conflicting Redirect Logic:
+Multiple parts of the app (e.g., auth.tsx, App.tsx, and AuthContext.tsx) might have conflicting redirect rules. For example, the fix in auth.tsx to navigate to /onboarding might be bypassed by a higher-level redirect in App.tsx that prioritizes /home for authenticated users.
+Database Sync Delay:
+The createUserDocument function in auth.ts sets onboardingComplete: false for new users, but if there’s a delay in syncing this with the Firebase database, the app might not recognize the user as new when the redirect decision is made, defaulting to /home.
+Session Storage Misbehavior:
+The intentional_onboarding or new_user flag in sessionStorage might be cleared or not persisting across the sign-up process, causing the condition in auth.tsx (e.g., if (intentional_onboarding || isSignUp)) to fail and fall back to the /home redirect.
+What’s Likely the Root Cause
+The primary issue seems to be a race condition or logic override:
+
+The sign-up process in auth.tsx tries to set the new_user flag and redirect to /onboarding, but the App.tsx auth listener (which runs continuously) detects the new authentication state and immediately redirects to /home before the onboarding logic can take effect.
+The attempted fixes (e.g., adding setTimeout, updating createUserDocument, and simplifying logic) haven’t fully resolved this because the auth state listener’s priority is overriding the sign-up flow’s intent.
+How to Fix the Issue
+The problem can be resolved by ensuring the app prioritizes the new user state during the sign-up process:
+
+Ensure New User Detection: The app needs a reliable way to identify a freshly signed-up user (e.g., via a new_user flag or onboardingComplete: false from the database) and enforce the /onboarding redirect before any other navigation logic kicks in.
+Control Redirect Timing: The sign-up flow should complete its redirect to /onboarding before the global auth listener in App.tsx takes over.
+Simplify Logic: Remove conflicting conditions and ensure a single point of truth for new user redirects.
+The activity log shows that the latest attempt simplified the flow and added safeguards (e.g., setting new_user before authentication, using setTimeout for navigation), but the issue persists, suggesting the auth listener or database sync is still interfering.
+
+What to Try Next
+Test with a New Account: Sign up with a fresh email to confirm the behavior. If it still goes to /home, the issue is in the auth listener or database check.
+Check Console Logs: Look at the browser console (right-click > Inspect > Console) after signing up to see if there are warnings or errors about navigation or flag states.
+Verify Database State: Ensure the onboardingComplete field is set to false in the user’s document in Firebase immediately after sign-up, and that the app checks this before redirecting.
+The fix lies in aligning the sign-up flow’s redirect with the app’s auth state management, likely requiring a tweak to how App.tsx handles new users or how auth.tsx communicates the new user state. Since you’re seeing the issue live, the next step is to validate the current state and adjust the logic accordingly. Let me know the console output or any new observations after testing!

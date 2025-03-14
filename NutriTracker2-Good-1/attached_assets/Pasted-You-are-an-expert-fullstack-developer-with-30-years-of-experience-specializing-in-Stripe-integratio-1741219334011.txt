@@ -1,0 +1,91 @@
+You are an expert fullstack developer with 30 years of experience, specializing in Stripe integrations, React.js, Node.js, and Tailwind CSS, working on the "Saraat AI" calorie tracking web application in Replit. We need you to thoroughly analyze and fix the Stripe integration in the `TrialPage` component (`/frontend/src/components/TrialPage.jsx`) to resolve the error "Missing value for Stripe(): apiKey should be a string," ensure the 3-day free trial works correctly for the yearly plan (SAR 129.99/year) and monthly plan (SAR 39.99/mo), and implement a seamless payment flow, including Apple Pay support for iPhone users. The app name is "Saraat AI," and we’re using our custom logo (already inserted in the project). The page design matches the provided screenshot, showing a timeline, plan selection, "No Payment Due Now" checkbox, "Start My 3-Day Free Trial" button, and the error message below the button. Follow these steps with meticulous attention to detail, ensuring no line of code or configuration is missed, and provide a complete solution:
+
+1. **Analyze the Full Code Structure**
+   - Examine every line of the provided `TrialPage` component code, including imports, state management, functions, and JSX structure:
+     - Imports: `{ Button, Card }` from `"@/components/ui/button"` and `"@/components/ui/card"`, `{ ChevronLeft, Check }` from `"lucide-react"`, `{ useLocation }` from `"wouter"`, `{ useState }` from `"react"`, and `{ loadStripe }` from `"@stripe/stripe-js"`.
+     - State: `selectedPlan` (type `'yearly' | 'monthly'`, default `'yearly'`), `isLoading`, and `error`.
+     - Function: `handleSubscribe`, which uses `fetch` to call `/api/create-subscription`, initializes Stripe with `stripePromise`, and redirects to Stripe Checkout with `redirectToCheckout`.
+     - JSX: Layout with back arrow, title, timeline (for yearly plan), plan selection (monthly/yearly cards), checkbox, button, and error message.
+   - Identify any potential issues with syntax, environment variable usage, dependency versions, or logic flow that could cause the "Missing value for Stripe(): apiKey should be a string" error or prevent the payment flow from working.
+
+2. **Resolve the Stripe API Key Error**
+   - The error indicates that the Stripe API key (`apiKey`) is missing or not properly configured when initializing Stripe with `loadStripe`. Analyze:
+     - The line `const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)` to ensure `VITE_STRIPE_PUBLISHABLE_KEY` is correctly set.
+     - Check if `import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY` returns a valid string (e.g., `pk_test_...`) or `undefined`/`null`.
+   - Fix by:
+     - Verifying that `VITE_STRIPE_PUBLISHABLE_KEY` is defined in Replit’s Secrets or `.env` file as a string (e.g., `pk_test_123456789`).
+     - If using Vite, ensure the `.env` file is named `.env` (not `.env.local` or similar) and contains `VITE_STRIPE_PUBLISHABLE_KEY=pk_test_...`.
+     - Add a fallback or error check in `loadStripe`:
+       - If `import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY` is missing or not a string, log an error and throw an exception (e.g., `console.error('Stripe publishable key is missing or invalid'); throw new Error('Stripe initialization failed');`).
+     - Ensure the Replit project environment is configured to load Vite environment variables correctly (e.g., `VITE_` prefix for public variables).
+
+3. **Verify and Configure Stripe Price IDs**
+   - Analyze the code’s use of `import.meta.env[selectedPlan === 'yearly' ? 'VITE_STRIPE_YEARLY_PRICE_ID' : 'VITE_STRIPE_MONTHLY_PRICE_ID']` to retrieve price IDs.
+   - The error might occur if `VITE_STRIPE_YEARLY_PRICE_ID` or `VITE_STRIPE_MONTHLY_PRICE_ID` is missing or invalid in the environment.
+   - Fix by:
+     - Requesting the user to provide the Stripe price IDs for both plans:
+Please provide the Stripe price IDs for your recurring products (yearly: SAR 129.99/year and monthly: SAR 39.99/mo) created in your Stripe Dashboard. Enter them as environment variables in Replit’s Secrets: VITE_STRIPE_YEARLY_PRICE_ID (e.g., price_123) and VITE_STRIPE_MONTHLY_PRICE_ID (e.g., price_456).
+
+text
+
+Collapse
+
+Wrap
+
+Copy
+- Once provided, add `VITE_STRIPE_YEARLY_PRICE_ID` and `VITE_STRIPE_MONTHLY_PRICE_ID` to Replit’s Secrets as strings (e.g., `price_123` for yearly, `price_456` for monthly).
+- Verify these are recurring subscription prices in Stripe, supporting trials for the yearly plan, and match the currency (SAR) and amounts (SAR 129.99/year, SAR 39.99/mo).
+- Debug the `console.log` in `handleSubscribe` to confirm the environment variables are correctly populated.
+
+4. **Fix the 3-Day Free Trial Implementation**
+- Analyze the `trial_period_days: selectedPlan === 'yearly' ? 3 : undefined` logic in the `fetch` request to `/api/create-subscription`.
+- Ensure the 3-day free trial is only applied to the yearly plan (SAR 129.99/year), and the monthly plan (SAR 39.99/mo) doesn’t include a trial, matching the user’s intent.
+- Fix by:
+- Confirming in Stripe that the yearly price ID supports trials (if not, guide the user to update the product/price in Stripe to allow `trial_period_days`).
+- Ensuring the backend `/api/create-subscription` endpoint correctly passes `trial_period_days: 3` for the yearly plan to Stripe’s `checkout.sessions.create`.
+
+5. **Ensure Stripe Payment Popup/Redirect Works**
+- The "Start My 3-Day Free Trial" button uses `stripe.redirectToCheckout({ sessionId })`, but it fails if the backend doesn’t return a valid `sessionId` or if Stripe initialization fails.
+- Fix by:
+- Verifying the `/api/create-subscription` endpoint in `/backend/routes/payment.js` exists and returns a Stripe Checkout Session ID:
+- The endpoint should use `stripe.checkout.sessions.create` with `mode: 'subscription'`, `lineItems` (using the price ID), `successUrl`, `cancelUrl`, and `subscription_data: { trial_period_days: 3 }` for the yearly plan.
+- Return `{ id: sessionId }` in JSON format.
+- Ensuring the `fetch` call in `handleSubscribe` receives a valid response and passes the `sessionId` to `redirectToCheckout`.
+- Adding error handling for `stripe.redirectToCheckout` to display any errors (e.g., `if (stripeError) setError(stripeError.message);`).
+- For iPhone users, ensure `paymentMethodTypes: ['card', 'apple_pay']` in `redirectToCheckout` triggers the Apple Pay sheet in Safari (iOS 10+), testing with a test card (e.g., 4242 4242 4242 4242).
+
+6. **Fix Navigation and UI Issues**
+- The back arrow uses `navigate("/payment")`, but if it causes an Error 404, the route might be misconfigured.
+- Fix by:
+- Checking `/frontend/src/App.jsx` to ensure `/payment` or the correct route for this page is defined in React Router.
+- Updating the back arrow to use `navigate(-1)` or point to the correct previous route (e.g., `/onboarding/goals-guide`) if `/payment` isn’t valid.
+- Ensure the "Restore" button (currently just text) is implemented with an `onClick` handler calling `/api/payment/restore` to restore subscriptions, displaying feedback in a modal or alert.
+
+7. **Verify Environment and Dependencies**
+- Confirm the build tool (Vite, based on `import.meta.env`) and ensure `import.meta.env` works correctly for environment variables.
+- Check `@stripe/stripe-js` and `stripe` package versions with `npm list @stripe/stripe-js stripe` and update if necessary (`npm update @stripe/stripe-js stripe`).
+- Ensure Replit’s Secrets or `.env` file includes:
+- `VITE_STRIPE_PUBLISHABLE_KEY=pk_test_...`
+- `VITE_STRIPE_YEARLY_PRICE_ID=price_...`
+- `VITE_STRIPE_MONTHLY_PRICE_ID=price_...`
+
+8. **Implement Backend `/api/create-subscription`**
+- In `/backend/routes/payment.js`, create or update the `/api/create-subscription` endpoint:
+- Use `stripe` (initialized with `process.env.STRIPE_SECRET_KEY`) to create a Checkout Session:
+- Accept `plan`, `priceId`, and `trial_period_days` in the request body.
+- Use `stripe.checkout.sessions.create` with `mode: 'subscription'`, the appropriate `priceId`, `successUrl`, `cancelUrl`, and `subscription_data: { trial_period_days: 3 }` for the yearly plan.
+- Return `{ id: sessionId }` in JSON.
+- Ensure `/backend/db.js` has a `subscriptionId` column in the `users` table to store the subscription ID.
+
+9. **Test Thoroughly**
+- Use Stripe test mode with `VITE_STRIPE_PUBLISHABLE_KEY` and `STRIPE_SECRET_KEY` in Replit Secrets.
+- Test the "Start My 3-Day Free Trial" button to ensure it triggers the Stripe checkout, applies the 3-day trial for the yearly plan, and shows Apple Pay for iPhone users in Safari.
+- Use a test card (4242 4242 4242 4242) to simulate the flow, verify the trial ends on March 8, 2025 (or 3 days from now), and check that SAR 129.99 is charged after the trial (use Stripe’s test clock).
+- Test navigation (back arrow, Restore button), plan switching, and error handling.
+
+10. **Ensure Design and Functionality Match the Screenshot**
+- Verify the UI matches the screenshot exactly: title, timeline, plan cards, checkbox, button, error message, and text below the button, using Tailwind CSS for black, white, gray, and orange colors, rounded edges, and icons.
+- Use the "Saraat AI" app name and custom logo consistently.
+- Ensure responsiveness and integration with the onboarding flow (back arrow, progress bar, React Router).
+
+Provide a complete, line-by-line analysis of the `TrialPage` code, identifying any typos, syntax errors, or logic flaws. Log all debugging information in `console.log` statements within `handleSubscribe` to trace the flow (e.g., environment variables, fetch responses, Stripe initialization). Deliver the fixed code with detailed comments explaining each change, ensuring no errors are missed and the Stripe integration works flawlessly for both plans, with a 3-day free trial for the yearly plan and Apple Pay support for iPhone users.

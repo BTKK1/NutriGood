@@ -1,0 +1,32 @@
+You are an expert fullstack developer with 30 years of experience, currently working on the "Saraat AI" calorie tracking web application in Replit, built with React.js for the frontend, Express.js for the backend, and Tailwind CSS for styling. We need to update the onboarding screen for "You have great potential to crush your goal" (`/frontend/src/components/PotentialGoal.jsx` or similar) to include the exact weight transition graph shown in the screenshot, dynamically generated based on the user’s onboarding answers (e.g., goal, weight, height, gender, workouts per week, weight loss speed). We also need to ensure the app name is "Saraat AI" and use our custom logo (already inserted in the project) instead of "Cal AI." Here’s what to do:
+
+1. **Frontend: Update the Potential Goal Screen**
+   - Modify `/frontend/src/components/PotentialGoal.jsx` to include a line chart using the `react-chartjs-2` library (or another charting library like Chart.js) that matches the design in the screenshot:
+     - Display the title "You have great potential to crush your goal" in bold, black text at the top.
+     - Create a line chart with a single dataset:
+       - "Your weight transition": A black line showing a gradual weight loss over 30 days, starting at the user’s current weight (from onboarding) and increasing gradually to reflect the user’s weight loss goal (e.g., losing weight based on their goal and weight loss speed—0.1 kg/week, 0.8 kg/week, or 1.5 kg/week). The line should have dots (○) at 3 Days, 7 Days, and 30 Days, with a trophy icon (🏆) at 30 Days.
+       - Use a light peach shaded area under the line to highlight the weight loss progress, with a gradient effect fading to white.
+       - Label the x-axis with "3 Days," "7 Days," and "30 Days."
+     - Include the text "Based on Saraat AI’s historical data, weight loss is usually delayed at first, but after 7 days, you can burn fat like crazy!" below the chart in gray text, styled with Tailwind CSS (`text-gray-500`, `text-sm`).
+     - Ensure the chart and text are contained within a card-like container with rounded corners and a subtle shadow, styled with Tailwind CSS (`bg-white`, `rounded-lg`, `shadow-md`).
+     - Use our custom "Saraat AI" logo (already inserted in the project, e.g., as an image file in `/public` or `/frontend/src/assets`) as a header or branding element if applicable, replacing any references to "Cal AI."
+     - Ensure the layout is responsive, centered, and styled with Tailwind CSS to match the minimalist design (black, white, gray, and peach colors, rounded edges, icons) from the screenshot.
+   - Fetch the user’s data from the backend via GET `/api/weight-transition` to calculate the graph data dynamically, using `fetch` or `axios` in the `useEffect` hook. Pass the user’s onboarding data (current weight, goal, weight loss speed) to render the chart accurately.
+   - Update any references in the component or related files (e.g., navigation, titles) to consistently use "Saraat AI" instead of "Cal AI."
+
+2. **Backend: Create Weight Transition Endpoint**
+   - In `/backend/routes/weightTransition.js`, create a GET endpoint `/api/weight-transition` to generate the weight transition data for the graph based on the user’s onboarding inputs stored in the `users` table:
+     - Retrieve the user’s `currentWeight`, `goal` (e.g., "Lose weight"), `weightSpeed` (e.g., "0.1kg," "0.8kg," "1.5kg"), `height`, `gender`, and `workoutsPerWeek` from the `users` table.
+     - Calculate the "Your weight transition" trend:
+       - Start with the user’s current weight at 3 Days.
+       - Maintain the weight (no change) at 3 Days and 7 Days to reflect the delay in weight loss, then increase gradually to show weight loss progress by 30 Days based on the `weightSpeed` (e.g., 0.1 kg/week = 0.03 kg loss over 30 days, 0.8 kg/week = 0.23 kg loss over 30 days, 1.5 kg/week = 0.43 kg loss over 30 days, adjusted for realism and safety).
+       - Ensure the line ends at 30 Days with a stable weight loss, reflecting the user’s goal and speed, with a trophy icon (🏆) indicating success.
+     - Return the data as JSON in a format compatible with Chart.js, including a dataset for the line with labels, colors (black for the line, peach for the shaded area), and points (dots at 3, 7, and 30 days). Include x-axis labels ("3 Days," "7 Days," "30 Days") and y-axis values (weights in kg or lb, depending on user preference).
+   - Ensure the backend handles errors, validates inputs, and returns appropriate JSON responses. Update `/backend/db.js` if needed to ensure all relevant user data is accessible.
+
+3. **Integration and Testing**
+   - Ensure the `PotentialGoal.jsx` component integrates seamlessly with the existing onboarding flow (back arrow, progress bar) and React Router setup in `/frontend/src/App.jsx`.
+   - Test the changes in Replit to verify the graph displays correctly, reflects the user’s specific onboarding data, and matches the exact design from the screenshot (including colors, lines, shading, text, and the custom "Saraat AI" logo). Maintain the clean, minimalist design with black, white, gray, peach, and orange colors, rounded edges, and icons.
+   - Provide comments in the code for clarity and scalability, ensuring the graph updates dynamically based on user inputs and consistently uses "Saraat AI" throughout.
+
+Once these updates are implemented and tested, the "You have great potential to crush your goal" screen will accurately display the weight transition graph with the correct app name "Saraat AI" and our custom logo, providing a seamless and visually consistent experience.

@@ -1,0 +1,31 @@
+Design a UI layout that exactly matches the second reference image provided. Follow these detailed instructions to achieve a perfect 10/10 match:
+
+1. Pop-Up Modal Design:
+Create a pop-up modal with four distinct buttons displayed in a 2x2 grid format.
+Each button should be in a rounded, white box with soft shadows.
+Ensure the modal size is compact, just like in the reference image, avoiding any large, empty spaces.
+2. Button Details:
+The four buttons must include:
+'Log Exercise' with a dumbbell icon.
+'Saved Foods' with a bookmark icon.
+'Food Database' with a magnifying glass icon.
+'Scan Food' with a camera icon.
+Icons should be the same size as in the reference, centered with a clear and modern look.
+The text should be medium-sized, aligned perfectly below the icons.
+3. Button Size and Positioning:
+All buttons should be the exact same size.
+The spacing between the buttons should match the reference image closely.
+Maintain uniform padding and ensure the buttons are not too large or too small.
+4. Plus Button Design:
+The plus button must be at the bottom center of the screen, matching the exact position and size of the reference.
+The button should have a clear, centered plus icon with a consistent design.
+5. Interaction and Animation:
+Clicking the plus button should open the modal with a smooth animation.
+Ensure all buttons are interactive and provide a hover or press effect to indicate functionality.
+6. Design Consistency:
+Stick to the same color scheme, fonts, and styling as the reference.
+Avoid large containers or unnecessary elements that distract from the core modal design.
+7. Testing and Validation:
+Before finalizing, test all elements to ensure they match the reference in both appearance and functionality.
+Double-check that all clickable elements are fully functional and that the modal opens and closes smoothly.
+Replicate the exact layout, including spacing, sizing, and design elements, to achieve a perfect clone of the reference UI. The goal is to deliver a clean, polished, and professional interface that mirrors the provided design without any deviations.

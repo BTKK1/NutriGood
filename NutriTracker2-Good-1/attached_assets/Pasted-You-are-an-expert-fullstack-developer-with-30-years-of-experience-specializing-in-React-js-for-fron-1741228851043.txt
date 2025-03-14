@@ -1,0 +1,97 @@
+You are an expert fullstack developer with 30 years of experience, specializing in React.js for frontend development, Tailwind CSS for styling, and Firebase (Authentication, Firestore, Realtime Database, Cloud Functions) for backend development. You are currently working on the "Saraat AI" calorie tracking web application in Replit, following the detailed prompts provided earlier to clone the app from the initial 10 screenshots. The user has provided 10 additional screenshots introducing new features: "Food Database" (with subpages for creating foods and meals) and "Log Exercise" (with subpages for selecting exercise type, setting intensity, and describing exercises). These features should integrate seamlessly with the existing app, using the same black "+" icon and the four-box widget layout observed in the "Widgets" section of the original screenshots. The four boxes should represent "Log exercise," "Saved foods," "Food Database," and "Scan food," as seen in the updated Widgets page. Update the existing structure and add new components accordingly. Follow these steps:
+
+#### Frontend Implementation
+- **Analysis**:
+  - Review the new screenshots to understand the "Food Database" and "Log Exercise" features.
+  - Note the consistent use of a black "+" icon for actions (e.g., "Create a Food," "Create a Meal," "Add" for exercises) and the four-box layout in the Widgets section.
+  - Identify the navigation pattern with a back arrow ("<") and the use of tabs or buttons for sub-options.
+- **Structure Update**:
+  - Modify `/frontend/src/components/WidgetsPage.jsx` to include four clickable boxes: "Log exercise," "Saved foods," "Food Database," and "Scan food," styled with Tailwind CSS to match the original design (white rounded cards, black text, centered icons from `@heroicons/react`).
+  - Add new components:
+    - `/frontend/src/components/FoodDatabasePage.jsx` for the main Food Database page.
+    - `/frontend/src/components/CreateFoodPage.jsx` for creating foods.
+    - `/frontend/src/components/CreateMealPage.jsx` for creating meals.
+    - `/frontend/src/components/ExerciseLogPage.jsx` for the main exercise logging page.
+    - `/frontend/src/components/ExerciseTypePage.jsx` for selecting exercise type.
+    - `/frontend/src/components/ExerciseIntensityPage.jsx` for setting intensity.
+    - `/frontend/src/components/DescribeExercisePage.jsx` for describing exercises.
+  - Use the same navigation bar ("Home," "Analytics," "Settings," "+") and ensure the "+" button triggers the new logging features.
+- **Functionality**:
+  - **Food Database Page**:
+    - Display a search input ("Describe what you ate") with a placeholder.
+    - Include tabs/buttons: "All," "My meals," "My foods," "Saved scans" (default to "My foods").
+    - Show a "You have created no foods" message with a "Create a Food" button (using the "+" icon) that navigates to `CreateFoodPage`.
+    - Add a "Create a Meal" button (using the "+" icon) that navigates to `CreateMealPage`.
+    - Integrate suggestions list with "Log empty food" and food items (e.g., "Peanut Butter," "Avocado") with "+" buttons for logging.
+  - **Create Food Page**:
+    - Display "You have created no meals" with a "Create a Meal" button (using the "+" icon).
+    - Include a note about mixing foods into meals.
+  - **Create Meal Page**:
+    - Show "No saved foods" with an example image and instructions to save food while editing a log.
+  - **Exercise Log Page**:
+    - Display exercise type options: "Run," "Weight lifting," "Describe" with icons and descriptions.
+    - Each option navigates to the respective subpage (e.g., "Run" to `ExerciseIntensityPage`).
+  - **Exercise Type Subpages**:
+    - For "Run" and "Weight lifting," show "Set intensity" with radio options (e.g., High, Medium, Low) and "Duration" with buttons (15 mins, 30 mins, 60 mins, 90 mins) and a custom input.
+    - Include an "Add" button (using the "+" icon) to save the exercise.
+  - **Describe Exercise Page**:
+    - Show a text input for exercise description with "Created by AI" tag and an example.
+    - Include an "Edit Exercise" button (using the "+" icon) to modify the entry.
+- **Implementation Steps**:
+  1. Update `/frontend/src/App.jsx` with React Router to add routes:
+     - `/food-database` to `FoodDatabasePage`.
+     - `/create-food` to `CreateFoodPage`.
+     - `/create-meal` to `CreateMealPage`.
+     - `/log-exercise` to `ExerciseLogPage`.
+     - `/exercise-type` to `ExerciseTypePage`.
+     - `/exercise-intensity` to `ExerciseIntensityPage`.
+     - `/describe-exercise` to `DescribeExercisePage`.
+  2. Install `@heroicons/react` if not already installed: `npm install @heroicons/react`.
+  3. Update `WidgetsPage.jsx` to include the four boxes with icons (`PlusIcon`, `BookOpenIcon`, `SearchIcon`, `CameraIcon` from `@heroicons/react/24/outline`) and navigation handlers.
+  4. Create `FoodDatabasePage.jsx` with the described structure, using Tailwind classes (e.g., `bg-gray-100`, `rounded-lg`, `text-black`).
+  5. Create `CreateFoodPage.jsx` and `CreateMealPage.jsx` with their respective layouts and navigation to subpages.
+  6. Create `ExerciseLogPage.jsx` with exercise type options and navigation.
+  7. Create `ExerciseTypePage.jsx` (e.g., for "Run" and "Weight lifting") with intensity and duration inputs, styled with Tailwind radio and button components.
+  8. Create `DescribeExercisePage.jsx` with a text input and "Created by AI" tag.
+  9. Use `useState` and `useEffect` to manage tab states and navigate between pages.
+  10. Ensure the "+" icon is consistent across all action buttons (e.g., `<PlusIcon className="w-6 h-6 text-black" />`).
+- **Testing**:
+  - Verify navigation between Food Database subpages and Exercise logging subpages.
+  - Ensure the "+" button triggers the correct action (e.g., create food, add exercise).
+  - Test responsiveness on mobile and desktop, ensuring icons and buttons align with the original design.
+  - Confirm suggestion list and exercise options display correctly.
+
+#### Backend Implementation
+- **Analysis**:
+  - Extend Firebase to support food and exercise data storage.
+- **Structure Update**:
+  - Add Firestore collections:
+    - `users/{userId}/foods` for created foods.
+    - `users/{userId}/meals` for created meals.
+    - `users/{userId}/savedScans` for saved scans.
+    - `users/{userId}/exercises` for logged exercises.
+- **Functionality**:
+  - Store food items with names, calories, and serving sizes.
+  - Store meals as combinations of foods.
+  - Save exercise logs with type, intensity, duration, and description.
+  - Use Cloud Functions to suggest foods based on user input and calculate burned calories.
+- **Implementation Steps**:
+  1. Update `/backend/firebase.js` to include new collections.
+  2. Create a Cloud Function in `/backend/functions/index.js` for food suggestions:
+     - `exports.suggestFoods = functions.https.onCall((data, context) => {...});` to return a list based on "Describe what you ate" input.
+  3. Create a Cloud Function for exercise calorie calculation:
+     - `exports.calculateBurnedCalories = functions.firestore.document('users/{userId}/exercises/{entry}').onWrite((change, context) => {...});`.
+  4. Set up Firestore security rules to restrict access to authenticated users.
+  5. Test data storage with sample food and exercise entries in Replit’s Firebase console.
+- **Testing**:
+  - Verify food and meal data is saved and retrieved from Firestore.
+  - Check exercise logs with intensity and duration are stored correctly.
+  - Test food suggestions and calorie calculations in the Cloud Functions logs.
+
+#### Additional Instructions
+- Provide detailed comments in the new components explaining the structure (e.g., "// Food Database page with tabs and create options").
+- Log a `console.log` in each new component to confirm rendering (e.g., `console.log('FoodDatabasePage loaded');`).
+- Ensure the "+" icon and four-box layout match the original Widgets page design exactly.
+- Integrate these features with the existing navigation bar, ensuring the "+" button serves as a shortcut to "Log exercise" or "Food Database" based on context.
+
+This prompt adds the new "Food Database" and "Log Exercise" features, using the same "+" icon and four-box layout, ensuring a seamless extension of the "Saraat AI" app. Proceed with the implementation and await the next 10 images for further updates.

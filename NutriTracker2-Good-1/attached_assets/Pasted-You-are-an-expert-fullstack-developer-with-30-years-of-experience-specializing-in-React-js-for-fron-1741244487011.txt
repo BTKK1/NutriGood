@@ -1,0 +1,47 @@
+You are an expert fullstack developer with 30 years of experience, specializing in React.js for frontend development, Tailwind CSS for styling, and Firebase (Authentication, Firestore, Realtime Database, Cloud Functions) for backend development. You are currently working on the "Saraat AI" calorie tracking web application in Replit. The user has provided a screenshot of the Main Dashboard showing the current state of the bottom navigation bar ("Home," "Analytics," "Settings," "+") and the Plus Menu (triggered by the "+" icon), which displays four boxes ("Log exercise," "Saved foods," "Food Database," "Scan food") in a 2x2 grid. However, the desired layout, as shown in a previous Widgets page screenshot, requires the four boxes to be split into two rows with two boxes per row, each box 100x100px, with a 10px horizontal gap between boxes in a row and a 10px vertical gap between rows. Additionally, confirm that the navigation bar icons ("Home," "Analytics," "Settings") are 24x24px with a 10px gap, the "+" icon is 40x40px, and the navigation bar height is 60px, all matching the minimalist black design. Troubleshoot Replit rendering issues to ensure the layout matches the desired design. Follow these steps:
+
+#### Frontend Implementation
+- **Analysis**:
+  - Current Plus Menu: Four boxes in a 2x2 grid (`grid grid-cols-2 gap-2.5`), total size ~200x200px, centered above the navigation bar.
+  - Desired Plus Menu: Four boxes in two rows (2 boxes per row), each box 100x100px, with a 10px horizontal gap between boxes in a row and a 10px vertical gap between rows, total size ~208x208px (2 boxes of 100px + 10px gap horizontally, 2 rows of 100px + 10px gap vertically).
+  - Navigation Bar: "Home," "Analytics," "Settings" icons should be 24x24px, "+" icon 40x40px, with 10px gaps, in a 60px-high bar.
+- **Structure Update**:
+  - Update `/frontend/src/components/PlusMenu.jsx` to adjust the layout of the four boxes.
+  - Verify `/frontend/src/components/NavigationBar.jsx` for icon sizes and positioning.
+- **Functionality**:
+  - Maintain navigation: each box navigates to `/log-exercise`, `/saved-foods`, `/food-database`, `/scan-food`.
+  - Ensure the "+" icon toggles the Plus Menu visibility.
+- **Implementation Steps**:
+  1. Open `/frontend/src/components/PlusMenu.jsx`.
+  2. Replace the 2x2 grid (`grid grid-cols-2 gap-2.5`) with a flexbox layout:
+     - Parent `div`: `flex flex-col gap-2.5 items-center` (10px vertical gap between rows).
+     - Two child `div` elements (one per row): `flex flex-row gap-2.5` (10px horizontal gap between boxes).
+     - Each box: `w-24 h-24 bg-white rounded-lg flex flex-col items-center justify-center` (100x100px), with icons (`FireIcon`, `BookOpenIcon`, `SearchIcon`, `CameraIcon` from `@heroicons/react/24/outline`, `w-6 h-6 text-black`).
+     - Adjust parent positioning: `absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-52` (total width ~208px).
+  3. Open `/frontend/src/components/NavigationBar.jsx` and confirm:
+     - Bar: `fixed bottom-0 w-full h-15 bg-gray-200 flex justify-between items-center px-4`.
+     - Icons: `HomeIcon`, `ChartBarIcon`, `CogIcon` with `w-6 h-6 text-black` (24x24px), `PlusIcon` with `w-10 h-10 bg-black rounded-full flex items-center justify-center text-white` (40x40px).
+     - Gaps: `gap-2.5` (10px).
+  4. Troubleshoot Replit rendering:
+     - Check for CSS overrides by inspecting the element in Replit’s browser dev tools (e.g., unexpected `display` or `position` properties).
+     - Ensure the viewport scales correctly by adding `<meta name="viewport" content="width=device-width, initial-scale=1.0">` to `/frontend/public/index.html` if missing.
+     - Force a re-render by adding a `key` prop to the `PlusMenu` component (e.g., `<PlusMenu key={isOpen ? 'open' : 'closed'} />`).
+- **Testing**:
+  - Verify the Plus Menu displays four boxes in two rows (2 boxes per row), each 100x100px, with a 10px horizontal gap between boxes and a 10px vertical gap between rows.
+  - Confirm the Plus Menu is centered above the navigation bar (total size ~208x208px).
+  - Check navigation bar icons: "Home," "Analytics," "Settings" at 24x24px, "+" at 40x40px, with 10px gaps, in a 60px-high bar.
+  - Test responsiveness on mobile and desktop, ensuring no overlap or distortion.
+  - Use Replit’s dev tools to inspect pixel measurements and adjust CSS if needed.
+
+#### Backend Implementation
+- **Analysis**:
+  - No backend changes are required.
+- **Testing**:
+  - Verify navigation routes still work.
+
+#### Additional Instructions
+- Add comments in `PlusMenu.jsx` (e.g., "// Adjusted to two rows with 2 boxes each, 10px gaps, to match Widgets page").
+- Log a `console.log` (e.g., `console.log('Plus Menu layout corrected to two rows');`).
+- Use exact measurements (100x100px boxes, 10px gaps, 24x24px and 40x40px icons) to match the design.
+
+This prompt corrects the Plus Menu layout to match the Widgets page screenshot and confirms the navigation bar's design, addressing Replit rendering issues for pixel-perfect alignment.

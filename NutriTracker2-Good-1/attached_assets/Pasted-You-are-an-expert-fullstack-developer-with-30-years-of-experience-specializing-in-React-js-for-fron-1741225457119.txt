@@ -1,0 +1,260 @@
+You are an expert fullstack developer with 30 years of experience, specializing in React.js for frontend development, Tailwind CSS for styling, and Firebase (Authentication, Firestore, Realtime Database, Cloud Functions) for backend development. You are tasked with building the "Saraat AI" calorie tracking web application, cloned exactly from the 10 provided screenshots, ensuring a seamless and fruitful experience. The app features goal progress tracking, nutrition logging, widget customization, settings (personal details, preferences), analytics, and a referral system, with a light gray background, white rounded cards, black buttons, and minimalistic icons. The navigation includes a bottom bar with "Home," "Analytics," "Settings," and a "+" button for adding data. Use React for the frontend, Tailwind CSS for styling, and Firebase for the backend, including Authentication for user management, Firestore/Realtime Database for data storage, and Cloud Functions for calculations (e.g., BMI). Analyze each page from the screenshots in detail, covering structure, functionality, and implementation steps for both frontend and backend. Provide step-by-step prompts for each page, ensuring no detail is missed, and include testing instructions. Start with the homepage and proceed sequentially through all pages, delivering a complete build process.
+
+---
+
+### Prompt 1: Build the Homepage (Goal Progress and Nutrition)
+
+#### Frontend Implementation
+- **Structure**:
+  - Create a new component `/frontend/src/components/HomePage.jsx`.
+  - Add a header with status indicators (e.g., "4/49 weight," "Healthy," "Overweight") at the top, styled with Tailwind CSS (light gray background, black text).
+  - Include a main section with "Goal Progress" title and a 100% goal achieved indicator on the right.
+  - Add a tab row with buttons "90 Days," "6 Months," "1 Year," "All time" (default to "90 Days"), using Tailwind for rounded, grayed-out buttons, with the active tab highlighted.
+  - Add a progress graph area below the tabs, initially showing two lines (120 and 115) with no detailed data, styled as a simple horizontal line with Tailwind.
+  - Include a "Nutrition" section with tabs "This week," "Last week," "2 wks. ago," "3 wks. ago" (default to "This week"), and a placeholder text "No data to show. This will update as you log more food."
+  - Add a bottom navigation bar with icons for "Home" (active), "Analytics," "Settings," and a "+" button, using Tailwind for consistent styling and React Router for navigation.
+- **Functionality**:
+  - Implement state management with `useState` to track the active timeframe tab and update the progress graph accordingly (initially static).
+  - Use `useState` for the nutrition tab, displaying the placeholder text initially.
+  - Make the "+" button trigger a modal or navigate to a logging page (to be defined later).
+- **Implementation Steps**:
+  1. Set up `/frontend/src/App.jsx` with React Router to route `/` to `HomePage`.
+  2. Install dependencies: `npm install react-router-dom tailide-react @heroicons/react`.
+  3. Create `HomePage.jsx` with the described structure, using Tailwind classes (e.g., `bg-gray-100`, `text-black`, `rounded-lg`).
+  4. Add event handlers for tab switching with `setState`.
+  5. Style the navigation bar with clickable icons linked to `/analytics`, `/settings`, and a logging route (e.g., `/log`).
+- **Testing**:
+  - Verify tab switching updates the active tab visually.
+  - Ensure the "+" button navigates or opens a modal (test with a console.log for now).
+  - Check responsiveness on mobile and desktop views.
+
+#### Backend Implementation
+- **Structure**:
+  - Set up Firebase in `/backend/firebase.js` with `firebase-admin` and `firebase` SDKs.
+  - Create a Firestore collection `users/{userId}/progress` for goal data and `users/{userId}/nutrition` for logged food.
+- **Functionality**:
+  - Initialize Firebase Authentication to manage user logins.
+  - Store initial progress data (e.g., 120, 115) and nutrition logs in Firestore.
+  - Use Cloud Functions to calculate goal achievement percentage based on weight data.
+- **Implementation Steps**:
+  1. Install Firebase: `npm install firebase firebase-admin`.
+  2. Configure `/backend/firebase.js` with your Firebase project credentials (provide API keys when prompted).
+  3. Create a Cloud Function in `/backend/functions/index.js` to compute goal progress (e.g., `exports.calculateProgress = functions.firestore.document('users/{userId}/progress/{entry}').onWrite((change, context) => {...});`).
+  4. Set up Firestore security rules to restrict access to authenticated users.
+  5. Test data storage with a sample user in Replit’s Firebase console.
+- **Testing**:
+  - Log in with a test user and verify progress data is saved in Firestore.
+  - Check Cloud Function logs to ensure percentage calculation works.
+
+---
+
+### Prompt 2: Build the Customization Page (Settings Subpage)
+
+#### Frontend Implementation
+- **Structure**:
+  - Create `/frontend/src/components/CustomizationPage.jsx`.
+  - Add a "Customization" header.
+  - Include a "Personal details" section with "Adjust goals" and "Change language" as clickable items (with ">" icons).
+  - Add a "Preferences" section with toggle switches for "Burned Calories" and "Live Activity" (initially off).
+  - Use the same navigation bar as the homepage.
+- **Functionality**:
+  - Navigate to subpages for "Adjust goals" and "Change language" on click.
+  - Toggle switches update user preferences in real-time.
+- **Implementation Steps**:
+  1. Set up React Router to route `/customization` to `CustomizationPage`.
+  2. Use `useState` for toggle states and `useEffect` to sync with Firebase.
+  3. Style with Tailwind (e.g., `flex`, `gap-2`, `toggle-switch` custom class).
+  4. Add navigation handlers to route to `/adjust-goals` and `/change-language`.
+- **Testing**:
+  - Verify navigation to subpages.
+  - Test toggle switches and ensure state changes.
+
+#### Backend Implementation
+- **Structure**:
+  - Extend Firestore with `users/{userId}/preferences` collection.
+- **Functionality**:
+  - Store toggle states and language preferences.
+- **Implementation Steps**:
+  1. Update `/backend/firebase.js` to include preferences collection.
+  2. Create a Cloud Function to update preferences on toggle change.
+  3. Test with a sample toggle update.
+- **Testing**:
+  - Confirm preferences are saved and retrieved from Firestore.
+
+---
+
+### Prompt 3: Build the Adjust Goals Page (Settings Subpage)
+
+#### Frontend Implementation
+- **Structure**:
+  - Create `/frontend/src/components/AdjustGoalsPage.jsx`.
+  - Add "Adjust goals" header with "Calories, carbs, fats, and protein" and "Change language" options.
+  - Include the same "Preferences" section as CustomizationPage.
+  - Use the same navigation bar.
+- **Functionality**:
+  - Allow input fields for nutritional goals.
+  - Navigate back to Customization on language click.
+- **Implementation Steps**:
+  1. Route `/adjust-goals` to `AdjustGoalsPage`.
+  2. Add input fields with Tailwind styling.
+  3. Sync inputs with Firebase via state.
+- **Testing**:
+  - Verify input updates and navigation.
+
+#### Backend Implementation
+- **Structure**:
+  - Update `users/{userId}/goals` in Firestore.
+- **Functionality**:
+  - Save and validate goal inputs.
+- **Implementation Steps**:
+  1. Add goal collection to `/backend/firebase.js`.
+  2. Create a Cloud Function for validation.
+- **Testing**:
+  - Test goal updates in Firestore.
+
+---
+
+### Prompt 4: Build the Widgets Page (Settings Subpage)
+
+#### Frontend Implementation
+- **Structure**:
+  - Create `/frontend/src/components/WidgetsPage.jsx`.
+  - Add "Widgets" header with "How to add?" on the right.
+  - Display circular widgets for calories, protein, carbs, and fats with values.
+  - Add "Scan Food" and "Barcode" buttons.
+  - Use the same navigation bar.
+- **Functionality**:
+  - Show dynamic widget data.
+  - Trigger scanning functionality on button clicks.
+- **Implementation Steps**:
+  1. Route `/widgets` to `WidgetsPage`.
+  2. Fetch data from Firebase for widgets.
+  3. Style with Tailwind for circular design.
+- **Testing**:
+  - Verify widget data display and button clicks.
+
+#### Backend Implementation
+- **Structure**:
+  - Add `users/{userId}/widgets` collection.
+- **Functionality**:
+  - Store widget preferences and scan data.
+- **Implementation Steps**:
+  1. Set up widget collection.
+  2. Handle scan data storage.
+- **Testing**:
+  - Test widget data storage.
+
+---
+
+### Prompt 5-7: Build Widget Addition Steps (Settings Subpages)
+
+#### Frontend Implementation
+- **Structure**:
+  - Create `/frontend/src/components/AddWidgetStep1.jsx`, `AddWidgetStep2.jsx`, `AddWidgetStep3.jsx`.
+  - Add sequential instructions for each step (e.g., "Hold an empty area...," "Search for Saraat AI...," "Pick the one...").
+  - Use the same navigation bar.
+- **Functionality**:
+  - Guide users through widget setup.
+- **Implementation Steps**:
+  1. Route `/add-widget/step1`, `/add-widget/step2`, `/add-widget/step3` accordingly.
+  2. Use state to track progress.
+- **Testing**:
+  - Verify step navigation.
+
+#### Backend Implementation
+- **Structure**:
+  - No direct backend changes.
+- **Functionality**:
+  - Prepare for widget data post-setup.
+- **Testing**:
+  - Ensure readiness.
+
+---
+
+### Prompt 8: Build the Settings Overview Page
+
+#### Frontend Implementation
+- **Structure**:
+  - Create `/frontend/src/components/SettingsPage.jsx`.
+  - Add "Settings" header with age, height, weight, and balance section.
+  - Include "Refer friends to earn $" button and Customization section.
+  - Use the same navigation bar.
+- **Functionality**:
+  - Display user data and trigger referral.
+- **Implementation Steps**:
+  1. Route `/settings` to `SettingsPage`.
+  2. Fetch data from Firebase.
+- **Testing**:
+  - Verify data display and button click.
+
+#### Backend Implementation
+- **Structure**:
+  - Update `users/{userId}/profile` and `balance`.
+- **Functionality**:
+  - Manage profile and referral credits.
+- **Implementation Steps**:
+  1. Set up profile and balance collections.
+  2. Add referral function.
+- **Testing**:
+  - Test profile updates and referrals.
+
+---
+
+### Prompt 9: Build the Main Dashboard Page
+
+#### Frontend Implementation
+- **Structure**:
+  - Create `/frontend/src/components/DashboardPage.jsx`.
+  - Add app name header with calendar and burn count.
+  - Include widgets and "Recently logged" section.
+  - Use the same navigation bar.
+- **Functionality**:
+  - Show dynamic data and logging prompt.
+- **Implementation Steps**:
+  1. Route `/dashboard` to `DashboardPage`.
+  2. Fetch data from Firebase.
+- **Testing**:
+  - Verify data updates.
+
+#### Backend Implementation
+- **Structure**:
+  - Update `users/{userId}/dashboard`.
+- **Functionality**:
+  - Store dashboard data.
+- **Implementation Steps**:
+  1. Set up dashboard collection.
+- **Testing**:
+  - Test data storage.
+
+---
+
+### Prompt 10: Build the Analytics Page
+
+#### Frontend Implementation
+- **Structure**:
+  - Create `/frontend/src/components/AnalyticsPage.jsx`.
+  - Add "Analytics" header with goal weight and update button.
+  - Include current weight, BMI section, and Goal Progress.
+  - Use the same navigation bar.
+- **Functionality**:
+  - Update weight and display BMI.
+- **Implementation Steps**:
+  1. Route `/analytics` to `AnalyticsPage`.
+  2. Add weight update form.
+- **Testing**:
+  - Verify weight updates and BMI display.
+
+#### Backend Implementation
+- **Structure**:
+  - Update `users/{userId}/analytics`.
+- **Functionality**:
+  - Calculate and store BMI.
+- **Implementation Steps**:
+  1. Add analytics collection.
+  2. Create BMI Cloud Function.
+- **Testing**:
+  - Test BMI calculation.
+
+---
+
+This sequence ensures a complete build, tested at each step, with Firebase integration for a seamless experience.

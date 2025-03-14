@@ -1,0 +1,121 @@
+import { useState } from "react";
+import { Link } from "wouter";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Search, Camera, Barcode, Plus, ChevronLeft } from "lucide-react";
+import { Apple } from "lucide-react";
+import FoodDatabaseGuide from "@/assets/images/Fooddatabase Guide.png";
+
+export default function FoodDatabase() {
+  return (
+    <div className="p-4 space-y-4">
+      {/* Header */}
+      <div className="flex items-center gap-2">
+        <Link href="/home">
+          <button className="p-2 rounded-full bg-gray-100">
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+        </Link>
+        <h1 className="text-xl font-semibold">Food Database</h1>
+      </div>
+
+      {/* Search Bar */}
+      <div className="relative">
+        <Search className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
+        <Input
+          placeholder="Describe what you ate"
+          className="w-full pl-10 py-6 bg-gray-50"
+        />
+      </div>
+
+      {/* Tabs */}
+      <Tabs defaultValue="all" className="w-full">
+        <TabsList className="grid w-full grid-cols-4 h-auto p-0 bg-transparent gap-2">
+          <TabsTrigger value="all" className="data-[state=active]:bg-transparent data-[state=active]:border-black data-[state=active]:border-b-2 rounded-none px-0">
+            All
+          </TabsTrigger>
+          <TabsTrigger value="meals" className="data-[state=active]:bg-transparent data-[state=active]:border-black data-[state=active]:border-b-2 rounded-none px-0">
+            My meals
+          </TabsTrigger>
+          <TabsTrigger value="foods" className="data-[state=active]:bg-transparent data-[state=active]:border-black data-[state=active]:border-b-2 rounded-none px-0">
+            My foods
+          </TabsTrigger>
+          <TabsTrigger value="scans" className="data-[state=active]:bg-transparent data-[state=active]:border-black data-[state=active]:border-b-2 rounded-none px-0">
+            Saved scans
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="all" className="mt-4">
+          <Card className="p-8 text-center space-y-3">
+            <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+              <span className="text-4xl">💼</span>
+            </div>
+            <p className="text-lg font-semibold">Create a food to add it to your database</p>
+            <Button variant="outline" className="w-full py-6">
+              <Plus className="w-5 h-5 mr-2" />
+              Create a Food
+            </Button>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="meals">
+          <Card className="p-8 text-center space-y-3">
+            <p className="text-lg font-semibold">You have created no meals.</p>
+            <Button variant="outline" className="w-full py-6">Create a Meal</Button>
+            <p className="text-sm text-gray-500">
+              Mix multiple foods together into a meal for easy and fast logging.
+            </p>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="foods">
+          <Card className="p-8 text-center space-y-3">
+            <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+              <span className="text-4xl">🍎</span>
+            </div>
+            <p className="text-lg font-semibold">You have created no foods.</p>
+            <Button variant="outline" className="w-full py-6">Create a Food</Button>
+            <p className="text-sm text-gray-500">
+              Create a food to add it to your database
+            </p>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="scans">
+          <div className="text-center space-y-4">
+            {/* Apple Icon and Title */}
+            <div className="flex flex-col items-center">
+              <Apple className="w-12 h-12 text-gray-400" />
+              <h2 className="text-xl font-semibold">No saved foods</h2>
+            </div>
+
+            {/* Card with Image and Content */}
+            <Card className="p-6 text-center space-y-4 bg-transparent border-none">
+              <img
+                src={FoodDatabaseGuide}
+                alt="Food Database Guide"
+                className="w-full h-[300px] object-cover object-center"
+                style={{ background: "transparent", border: "none" }} // Ensure no box effect
+              />
+              <p className="text-sm text-gray-500 mt-4">
+                To save food, press the <span className="font-medium">button</span> while editing a food log.
+              </p>
+            </Card>
+          </div>
+        </TabsContent>
+      </Tabs>
+
+      {/* Quick Action Buttons */}
+      <div className="fixed bottom-20 right-4 space-y-2">
+        <Button variant="secondary" className="w-12 h-12 rounded-full">
+          <Camera className="w-5 h-5" />
+        </Button>
+        <Button variant="secondary" className="w-12 h-12 rounded-full">
+          <Barcode className="w-5 h-5" />
+        </Button>
+      </div>
+    </div>
+  );
+}

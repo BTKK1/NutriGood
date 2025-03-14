@@ -1,0 +1,34 @@
+1. **Frontend: Update the Analytics Screen**
+   - Modify `/frontend/src/pages/Analytics.jsx` to include a line chart using the `react-chartjs-2` library (or another charting library like Chart.js) that matches the design in the screenshot:
+     - Display a title "Your Weight" in bold, black text at the top.
+     - Create a line chart with two datasets:
+       - "Saraat AI": A black line showing a steady weight loss from Month 1 to Month 6, starting at the user’s current weight (from onboarding) and decreasing gradually to reflect the user’s weight loss goal (e.g., losing 5 kg over 6 months, adjusted by their weight loss speed—0.1 kg/week, 0.8 kg/week, or 1.5 kg/week).
+       - "Traditional Diet": A red dashed line showing initial weight loss followed by a rebound, starting at the user’s current weight, dropping sharply by Month 1, then rising back up by Month 6 to exceed the starting weight.
+     - Use a light gray shaded area under the "Saraat AI" line to highlight the difference between the two trends, with a pink shaded area under the "Traditional Diet" line for contrast.
+     - Label the x-axis with "Month 1" and "Month 6," and include dots (○) at the start and end points of each line.
+     - Add our custom "Saraat AI" logo (already inserted in the project, e.g., as an image file in `/public` or `/frontend/src/assets`) with a "Weight" label as a legend or tooltip near the "Saraat AI" line.
+     - Include the text "80% of Saraat AI users maintain their weight loss even 6 months later" below the chart in gray text, styled with Tailwind CSS (`text-gray-500`, `text-lg`).
+     - Ensure the chart is responsive, centered, and styled with Tailwind CSS (`bg-white`, `rounded-lg`, `shadow-md`) to match the minimalist design from the screenshot.
+   - Fetch the user’s data from the backend via GET `/api/analytics` to calculate the graph data dynamically, using `fetch` or `axios` in the `useEffect` hook. Pass the user’s onboarding data (current weight, goal, weight loss speed) to render the chart accurately.
+   - Update any references in the component or related files (e.g., navigation, titles) to consistently use "Saraat AI" instead of "Cal AI."
+
+2. **Backend: Update Analytics Endpoint**
+   - In `/backend/routes/analytics.js`, update the GET `/api/analytics` endpoint to generate the weight trend data for the graph based on the user’s onboarding inputs stored in the `users` table:
+     - Retrieve the user’s `currentWeight`, `goal` (e.g., "Lose weight"), `weightSpeed` (e.g., "0.1kg," "0.8kg," "1.5kg"), `height`, `gender`, and `workoutsPerWeek` from the `users` table.
+     - Calculate the "Saraat AI" trend:
+       - Start with the user’s current weight at Month 1.
+       - Decrease the weight linearly over 6 months based on the `weightSpeed` (e.g., 0.1 kg/week × 26 weeks = 2.6 kg loss, 0.8 kg/week × 26 weeks = 20.8 kg loss, 1.5 kg/week × 26 weeks = 39 kg loss, adjusted for safety—cap at a realistic maximum loss like 5–10 kg over 6 months).
+       - Ensure the line ends at Month 6 with a stable weight, reflecting 80% maintenance of weight loss (e.g., if the goal is 5 kg loss, maintain 4 kg loss by Month 6).
+     - Calculate the "Traditional Diet" trend:
+       - Start with the user’s current weight at Month 1.
+       - Drop sharply by Month 1 (e.g., lose 10% of starting weight quickly).
+       - Rebound by Month 6, returning to or exceeding the starting weight (e.g., gain back 15% of starting weight).
+     - Return the data as JSON in a format compatible with Chart.js, including datasets for both lines with labels, colors (black for Saraat AI, red for Traditional Diet), and dashed styling for the Traditional Diet line. Include x-axis labels ("Month 1," "Month 6") and y-axis values (weights in kg or lb, depending on user preference).
+   - Ensure the backend handles errors, validates inputs, and returns appropriate JSON responses. Update `/backend/db.js` if needed to ensure all relevant user data is accessible.
+
+3. **Integration and Testing**
+   - Ensure the `Analytics.jsx` component integrates seamlessly with the existing navigation (back arrow, progress bar) and React Router setup in `/frontend/src/App.jsx`.
+   - Test the changes in Replit to verify the graph displays correctly, reflects the user’s specific onboarding data, and matches the exact design from the screenshot (including colors, lines, shading, text, and the custom "Saraat AI" logo). Maintain the clean, minimalist design with black, white, gray, and red colors, rounded edges, and icons.
+   - Provide comments in the code for clarity and scalability, ensuring the graph updates dynamically based on user inputs and consistently uses "Saraat AI" throughout.
+
+Once these updates are implemented and tested, the analytics screen will accurately display the weight trend graph with the correct app name "Saraat AI" and our custom logo, providing a seamless and visually consistent experience.

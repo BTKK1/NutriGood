@@ -1,0 +1,26 @@
+1. "Add burned calories to daily goal" Toggle
+Functionality:
+Enabled (Toggle On): When this option is toggled on, the calories burned from activities (e.g., the 278 calories from boxing shown in the second tab of your app) will be added to the user's daily calorie goal. This effectively increases the total calorie intake target for the day. For example, if the daily calorie goal is 2000 calories and 278 calories are burned, the adjusted goal might become 2278 calories. This reflects a scenario where the user wants to account for burned calories as part of their energy balance, potentially encouraging more food intake to maintain energy levels.
+Disabled (Toggle Off): When toggled off (default state as shown in the image), burned calories are not added to the daily goal. The app will track calories burned separately (as seen in the "Calories burned" card) but will not adjust the daily calorie target. The user’s progress toward the original goal (e.g., 2000 calories) remains based solely on consumed calories, with burned calories displayed for informational purposes only.
+Purpose: This feature allows users to customize how their activity impacts their calorie tracking. Enabling it is useful for users who want a dynamic goal that reflects their physical activity, while disabling it suits those who prefer a fixed target regardless of exercise.
+Example Behavior:
+If toggled on and the user burns 278 calories, the "Calories left" display (currently 2017) might adjust to reflect the new goal (e.g., 2017 + 278 = 2295 calories remaining from an adjusted 2278 goal).
+If toggled off, the "Calories left" remains 2017, and the 278 burned calories are tracked separately without affecting the goal.
+2. "Show your daily calories and macros on the lock screen and on dynamic island" Toggle
+Functionality:
+Enabled (Toggle On): When this option is toggled on, the app will display the user's daily calorie count (e.g., "2017 Calories left") and macro breakdowns (e.g., "118g Protein left," "260g Carbs left," "56g Fat left") on the device’s lock screen and, if applicable, on the Dynamic Island (a feature on iPhone 14 Pro and later models). This provides a quick glance at the user’s progress without unlocking the device, updating in real-time as data changes (e.g., after logging food or exercise).
+Disabled (Toggle Off): When toggled off (default state as shown in the image), this information will not be displayed on the lock screen or Dynamic Island. The user will need to open the app to view their calorie and macro data, maintaining privacy or reducing clutter on the lock screen.
+Purpose: This feature enhances accessibility and convenience, allowing users to monitor their goals at a glance. It’s particularly useful for users who frequently check their progress throughout the day. The Dynamic Island integration (if supported) could show a compact summary (e.g., "2017 cal left") with a tap to expand into macros.
+Example Behavior:
+If toggled on, the lock screen might show a widget or notification like "Cal AI: 2017 cal left, 118g protein" that updates dynamically.
+If toggled off, the lock screen remains free of this data, and the user sees it only within the app.
+Additional Considerations
+User Experience:
+Both toggles should persist across app sessions (e.g., using localStorage or a similar mechanism) so the user’s preference is remembered.
+Provide visual feedback (e.g., a confirmation toast) when toggling to confirm the change, especially for lock screen settings which may require device permissions.
+Technical Notes:
+For the lock screen and Dynamic Island feature, integration might require platform-specific APIs (e.g., iOS Widgets or Dynamic Island SDK). If not supported yet, the app could display a placeholder or prompt the user to enable it manually via system settings.
+Ensure the calorie adjustment logic (if "Add burned calories" is on) recalculates the "Calories left" display and progress circle in real-time.
+Edge Cases:
+If the adjusted goal exceeds the maximum tracked value, cap it and notify the user.
+Handle cases where the device doesn’t support Dynamic Island by gracefully degrading to lock screen display only.
